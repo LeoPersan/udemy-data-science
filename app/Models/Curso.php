@@ -5,18 +5,23 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
-class Aluno extends Model
+class Curso extends Model
 {
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['user_id','estudante','ano','formacao'];
+    protected $fillable = ['user_id','curso','preco'];
 
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function instrutores()
+    {
+        return $this->belongsToMany(Instrutor::class);
     }
 
     protected static function boot()

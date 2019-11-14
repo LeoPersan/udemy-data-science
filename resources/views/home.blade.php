@@ -18,7 +18,7 @@
                         @csrf
                         <div class="form-group">
                             <label>Envie todos os arquivos</label>
-                            <input type="file" class="form-control-file" name="arquivos[]" placeholder="Arquivos" multiple accept=".csv,.xls,.xlsx">
+                            <input type="file" class="form-control-file" name="arquivos[]" placeholder="Arquivos" multiple accept=".csv,.xls,.xlsx,.json">
                         </div>
                         <div class="form-group">
                             <button type="submit" class="btn btn-primary">Enviar</button>
