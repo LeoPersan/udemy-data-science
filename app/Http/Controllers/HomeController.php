@@ -6,8 +6,12 @@ use App\Imports\AlunoImport;
 use App\Imports\AvaliacaoImport;
 use App\Imports\DiplomaImport;
 use App\Imports\MatriculaImport;
+use App\Models\Aluno;
+use App\Models\Avaliacao;
 use App\Models\Curso;
+use App\Models\Diploma;
 use App\Models\Instrutor;
+use App\Models\Matricula;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -15,7 +19,22 @@ class HomeController extends Controller
 {
     public function index()
     {
-        return view('home');
+        return view('home',[
+            'avaliacoesCursos' => Avaliacao::distinct('curso')->get()->map(function ($curso) {
+                $curso->avaliacoes = Avaliacao::whereCurso($curso->curso)->get();
+                return $curso;
+            }),
+            'matriculasCursos' => Matricula::distinct('curso')->get()->map(function ($curso) {
+                $curso->matriculas = Matricula::whereCurso($curso->curso)->get();
+                return $curso;
+            }),
+            'diplomasCursos' => Diploma::distinct('curso')->get()->map(function ($curso) {
+                $curso->diplomas = Diploma::whereCurso($curso->curso)->get();
+                return $curso;
+            }),
+            'alunos' => Aluno::all(),
+            'cursos' => Curso::with('instrutores')->get(),
+        ]);
     }
 
     public function upload(Request $request)
