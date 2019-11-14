@@ -8,4 +8,5 @@ Route::get('/login/{drive}/callback', 'Auth\LoginController@handleProviderCallba
 
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/home', 'HomeController@index')->name('home');
+    Route::post('/home', 'HomeController@upload');
 });
