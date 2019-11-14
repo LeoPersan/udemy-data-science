@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\AlunoImport;
 use App\Imports\AvaliacaoImport;
 use App\Imports\DiplomaImport;
 use App\Imports\MatriculaImport;
@@ -23,12 +24,16 @@ class HomeController extends Controller
                 Excel::import(new AvaliacaoImport(),$arquivo);
             }
             if (preg_match('/[^\;]+;[^\;]+;[^\;]+;[^\;]+;[^\;]+;[^\;]+;[^\;]+;/',$arquivo->get())) {
-                $arquivo->storeAs('public/avaliacoes','avaliacao-'.date('Ymd-His').'-'.uniqid().'.csv');
+                $arquivo->storeAs('public/matriculas','matricula-'.date('Ymd-His').'-'.uniqid().'.csv');
                 Excel::import(new MatriculaImport(),$arquivo);
             }
             if (preg_match('/Nome_usuario,nome_evento,carga,data/',$arquivo->get())) {
-                $arquivo->storeAs('public/avaliacoes','avaliacao-'.date('Ymd-His').'-'.uniqid().'.csv');
+                $arquivo->storeAs('public/diplomas','diploma-'.date('Ymd-His').'-'.uniqid().'.csv');
                 Excel::import(new DiplomaImport(),$arquivo);
+            }
+            if (preg_match('/Nome,ano_nascimento,formacao/',$arquivo->get())) {
+                $arquivo->storeAs('public/alunos','aluno-'.date('Ymd-His').'-'.uniqid().'.csv');
+                Excel::import(new AlunoImport(),$arquivo);
             }
         }
     }

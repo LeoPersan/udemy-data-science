@@ -1,8 +1,8 @@
 * [x] Login/Cadastro
-* [ ] Importar Avaliações (Curso	Primeiro nome	Data de matrícula	Nota	Comentário)
-* [ ] Importar Matriculas e Aulas (Curso	Primeiro nome	Data de início	Data do último acesso	Progresso	Perguntas feitas	Perguntas respondidas)
-* [ ] Importar Diplomas (Primeiro nome	Curso	Carga horária	Data)
-* [ ] Importar Alunos (Primeiro nome	Ano de nascimento	Formação)
+* [x] Importar Avaliações (Curso	Primeiro nome	Data de matrícula	Nota	Comentário)
+* [x] Importar Matriculas e Aulas (Curso	Primeiro nome	Data de início	Data do último acesso	Progresso	Perguntas feitas	Perguntas respondidas)
+* [x] Importar Diplomas (Primeiro nome	Curso	Carga horária	Data)
+* [x] Importar Alunos (Primeiro nome	Ano de nascimento	Formação)
 * [ ] Importar Cursos (?)
 * [ ] Base de dados de avaliações
     * [ ] Collapse e Sortable nos gráficos gerais e de cada curso
