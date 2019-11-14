@@ -1,0 +1,34 @@
+version: '2'
+
+# Named volumes
+volumes:
+  # MySQL Data
+  desafio-mysql-data:
+    driver: local
+
+services:
+  # MySQL (5.7)
+  mysql:
+    image: mysql:5.7
+    container_name: desafio-mysql
+    volumes:
+      - desafio-mysql-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=secret
+      - MYSQL_DATABASE=desafio
+      - MYSQL_USER=homestead
+      - MYSQL_PASSWORD=secret
+
+  # PHP (with Nginx)
+  # you can change from nginx to apache, just change session 'image'
+  app:
+    image: ambientum/php:7.3-nginx
+    container_name: desafio-app
+    volumes:
+      - .:/var/www/app
+    ports:
+      - "80:8080"
+    links:
+      - mysql
