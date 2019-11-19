@@ -2,38 +2,71 @@
 
 namespace App\Http\Controllers;
 
-use App\Imports\AlunoImport;
-use App\Imports\AvaliacaoImport;
-use App\Imports\DiplomaImport;
-use App\Imports\MatriculaImport;
+use Lava;
 use App\Models\Aluno;
-use App\Models\Avaliacao;
 use App\Models\Curso;
 use App\Models\Diploma;
 use App\Models\Instrutor;
 use App\Models\Matricula;
+use App\Models\Avaliacao;
 use Illuminate\Http\Request;
+use App\Imports\AlunoImport;
+use App\Imports\DiplomaImport;
+use App\Imports\AvaliacaoImport;
+use App\Imports\MatriculaImport;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
 class HomeController extends Controller
 {
     public function index()
     {
+        $avaliacoesCursos = Avaliacao::withoutGlobalScope('order')->distinct()->get('curso')->map(function ($curso) {
+            $curso->qtde_avaliacoes = $curso->sum_avaliacoes = 0;
+
+            Avaliacao::whereCurso($curso->curso)->get()->map(function ($avaliacao) use (&$curso) {
+                $curso->qtde_avaliacoes++;
+
+                $curso->media += $avaliacao->avaliacao;
+            });
+            
+            $curso->media = $curso->media/$curso->qtde_avaliacoes;
+
+            return $curso;
+        })->sort(function ($a,$b) {
+            return $a->media < $b->media;
+        });
+
+        $dataTable = Lava::DataTable();
+        $dataTable->addStringColumn('Cursos')
+                ->addNumberColumn('Médias');
+        foreach ($avaliacoesCursos as $curso) {
+            $dataTable->addRow([$curso->curso,$curso->media]);
+        }
+        Lava::ColumnChart('mediaAvaliacoes', $dataTable, [
+            'title' => 'Média das Avaliações',
+            'titleTextStyle' => [
+                'color'    => '#eb6b2c',
+                'fontSize' => 14
+            ],
+        ]);
+
+        $matriculasCursos = Matricula::distinct()->get('curso')->map(function ($curso) {
+            $curso->matriculas = Matricula::whereCurso($curso->curso)->get();
+            return $curso;
+        })->sort(function ($a,$b) {
+            return $a->media_progresso < $b->media_progresso;
+        });
+
+        $diplomasCursos = Diploma::distinct()->get('curso')->map(function ($curso) {
+
+            return $curso;
+        });
+
         return view('home',[
-            'avaliacoesCursos' => Avaliacao::distinct('curso')->get()->map(function ($curso) {
-                $curso->avaliacoes = Avaliacao::whereCurso($curso->curso)->get();
-                return $curso;
-            }),
-            'matriculasCursos' => Matricula::distinct('curso')->get()->map(function ($curso) {
-                $curso->matriculas = Matricula::whereCurso($curso->curso)->get();
-                return $curso;
-            }),
-            'diplomasCursos' => Diploma::distinct('curso')->get()->map(function ($curso) {
-                $curso->diplomas = Diploma::whereCurso($curso->curso)->get();
-                return $curso;
-            }),
-            'alunos' => Aluno::all(),
-            'cursos' => Curso::with('instrutores')->get(),
+            'avaliacoesCursos' => $avaliacoesCursos,
+            'matriculasCursos' => $matriculasCursos,
+            'diplomasCursos' => $diplomasCursos,
         ]);
     }
 
