@@ -2,6 +2,9 @@
 @push('scripts')
 @columnchart('mediaAvaliacoes', 'mediaAvaliacoes')
 @columnchart('qtdeAvaliacoes', 'qtdeAvaliacoes')
+@foreach ($avaliacoesCursos as $curso)
+@areachart(str_slug($curso->curso).'QtdeAvaliacoes', str_slug($curso->curso).'QtdeAvaliacoes')
+@endforeach
 @endpush
 
 @section('content')
@@ -51,6 +54,25 @@
                                 </div>
                             </div>
                         </div>
+                        @foreach ($avaliacoesCursos as $curso)
+                        <div class="card">
+                            <div class="card-header" role="tab" id="{{str_slug($curso->curso)}}Header">
+                                <h5 class="mb-0">
+                                    <a data-toggle="collapse" data-parent="#avaliacoes"
+                                        href="#{{str_slug($curso->curso)}}Content" aria-expanded="false"
+                                        aria-controls="{{str_slug($curso->curso)}}Content">
+                                        {{$curso->curso}}
+                                    </a>
+                                </h5>
+                            </div>
+                            <div id="{{str_slug($curso->curso)}}Content" class="collapse show" role="tabpanel"
+                                aria-labelledby="{{str_slug($curso->curso)}}Header">
+                                <div class="card-body">
+                                    <div id="{{str_slug($curso->curso)}}QtdeAvaliacoes"></div>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
                     </div>
                 </div>
             </div>

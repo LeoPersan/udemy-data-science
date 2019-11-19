@@ -22,19 +22,43 @@ class HomeController extends Controller
     public function index()
     {
         $avaliacoesCursos = Avaliacao::withoutGlobalScope('order')->distinct()->get('curso')->map(function ($curso) {
+            $curso->quantidades = $curso->medias = [];
             $curso->qtde_avaliacoes = $curso->sum_avaliacoes = 0;
 
             Avaliacao::whereCurso($curso->curso)->get()->map(function ($avaliacao) use (&$curso) {
+                $quantidades = $curso->quantidades;
+                $mes = date('Y-m',strtotime($avaliacao->data));
 
+                if (!isset($quantidades[$mes])) {
+                    $quantidades[$mes] = ['avaliacoes' => 0,'comentarios' => 0];
+                }
                 if (!is_null($avaliacao->comentario)) {
                     $curso->qtde_comentarios++;
+                    $quantidades[$mes]['comentarios']++;
                 }
                 $curso->qtde_avaliacoes++;
+                $quantidades[$mes]['avaliacoes']++;
 
                 $curso->media += $avaliacao->avaliacao;
+                $curso->quantidades = $quantidades;
             });
             
             $curso->media = $curso->media/$curso->qtde_avaliacoes;
+
+            $dataTable = Lava::DataTable();
+            $dataTable->addStringColumn('Mês')
+                    ->addNumberColumn('Avaliações')
+                    ->addNumberColumn('Comentários');
+            foreach ($curso->quantidades as $mes => $quantidade) {
+                $dataTable->addRow([$mes, $quantidade['avaliacoes'], $quantidade['comentarios']]);
+            }
+            Lava::AreaChart(str_slug($curso->curso).'QtdeAvaliacoes', $dataTable, [
+                'title' => 'Qtde de Avaliações e Comentários',
+                'titleTextStyle' => [
+                    'color'    => '#eb6b2c',
+                    'fontSize' => 14
+                ],
+            ]);
 
             return $curso;
         })->sort(function ($a,$b) {
