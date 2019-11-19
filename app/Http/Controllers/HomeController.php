@@ -397,6 +397,30 @@ class HomeController extends Controller
             ],
         ]);
 
+        $alunos = Aluno::orderBy('estudante')->get('estudante');
+
+        $sexos = ['Masculino' => 0, 'Feminino' => 0, 'Bug' => 0];
+        foreach ($alunos as $aluno) {
+            if (preg_match('/[a]$/',$aluno->estudante)) $sexos['Feminino']++;
+            elseif (preg_match('/[ou]$/',$aluno->estudante)) $sexos['Masculino']++;
+            else $sexos['Bug']++;
+        }
+        arsort($sexos);
+
+        $dataTable = Lava::DataTable();
+        $dataTable->addStringColumn('Sexo')
+                ->addNumberColumn('Alunos');
+        foreach ($sexos as $sexo => $alunos) {
+            $dataTable->addRow([$sexo,$alunos]);
+        }
+        Lava::PieChart('sexoAlunos', $dataTable, [
+            'title' => 'Quantidade de alunos por sexo',
+            'titleTextStyle' => [
+                'color'    => '#eb6b2c',
+                'fontSize' => 14
+            ],
+        ]);
+
         return view('home',[
             'avaliacoesCursos' => $avaliacoesCursos,
             'matriculasCursos' => $matriculasCursos,

@@ -18,6 +18,7 @@
 @endforeach
 @piechart('formacaoAlunos','formacaoAlunos')
 @piechart('anosAlunos','anosAlunos')
+@piechart('sexoAlunos','sexoAlunos')
 @endpush
 
 @section('content')
@@ -191,6 +192,7 @@
                                 <div class="card-body">
                                     <div id="formacaoAlunos"></div>
                                     <div id="anosAlunos"></div>
+                                    <div id="sexoAlunos"></div>
                                 </div>
                             </div>
                         </div>
