@@ -10,6 +10,7 @@
 @columnchart('mediaProgresso','mediaProgresso')
 @foreach ($matriculasCursos as $curso)
 @combochart(str_slug($curso->curso).'QtdePerguntas', str_slug($curso->curso).'QtdePerguntas')
+@combochart(str_slug($curso->curso).'MediaProgresso', str_slug($curso->curso).'MediaProgresso')
 @endforeach
 @endpush
 
@@ -118,6 +119,7 @@
                                 aria-labelledby="{{str_slug($curso->curso)}}Header">
                                 <div class="card-body">
                                     <div id="{{str_slug($curso->curso)}}QtdePerguntas"></div>
+                                    <div id="{{str_slug($curso->curso)}}MediaProgresso"></div>
                                 </div>
                             </div>
                         </div>

@@ -133,13 +133,14 @@ class HomeController extends Controller
         $matriculasCursos = Matricula::distinct()->get('curso')->map(function ($curso) {
             $curso->matriculas = Matricula::whereCurso($curso->curso)->get();
             $curso->media_progresso = $curso->total_perguntas = 0;
-            $curso->qtde_perguntas = [];
+            $curso->qtde_perguntas = $curso->qtde_progressos = [];
             $curso->matriculas->map(function ($matricula) use (&$curso) {
                 $curso->media_progresso += $matricula->progresso;
                 $perguntas = $matricula->perguntas_feitas+$matricula->perguntas_respondidas;
                 $curso->total_perguntas += $perguntas;
 
                 $qtde_perguntas = $curso->qtde_perguntas;
+                $qtde_progressos = $curso->qtde_progressos;
                 if (!in_array(null,[$matricula->inicio,$matricula->ult_acesso])) {
                     $mes = date('Y-m-01',strtotime('-1 month',strtotime($matricula->inicio)));
                     $mes_fim = date('Y-m-01',strtotime($matricula->ult_acesso));
@@ -156,6 +157,16 @@ class HomeController extends Controller
                         $qtde_perguntas[$mes] = isset($qtde_perguntas[$mes]) ? $qtde_perguntas[$mes]+$media_perguntas : $media_perguntas;
                     }
                     $curso->qtde_perguntas = $qtde_perguntas;
+
+                    $meses = array_keys($qtde_perguntas);
+                    $progresso = $matricula->progresso;
+                    while ($progresso > 0) {
+                        $media_progresso = floor($progresso/(count($meses)?:1));
+                        $progresso -= $media_progresso;
+                        $mes = array_shift($meses);
+                        $qtde_progressos[$mes][] = $media_progresso;
+                    }
+                    $curso->qtde_progressos = $qtde_progressos;
                 }
                 return $matricula;
             });
@@ -172,6 +183,27 @@ class HomeController extends Controller
             }
             Lava::ComboChart(str_slug($curso->curso).'QtdePerguntas', $dataTable, [
                 'title' => 'Qtde de Perguntas',
+                'titleTextStyle' => [
+                    'color'    => '#eb6b2c',
+                    'fontSize' => 14
+                ],
+                'series' => [
+                    0 => ['type' => 'area'],
+                    1 => ['type' => 'columns'],
+                ]
+            ]);
+
+            $dataTable = Lava::DataTable();
+            $dataTable->addStringColumn('Mês')
+                    ->addNumberColumn('Progresso Acumulado')
+                    ->addNumberColumn('Progresso');
+            $progressoAcumulado = [];
+            foreach ($curso->qtde_progressos as $mes => $progresso) {
+                $progressoAcumulada = array_merge($progressoAcumulado,$progresso);
+                $dataTable->addRow([$mes, array_sum($progressoAcumulada)/(count($progressoAcumulada)?:1), array_sum($progresso)/(count($progresso)?:1)]);
+            }
+            Lava::ComboChart(str_slug($curso->curso).'MediaProgresso', $dataTable, [
+                'title' => 'Média de Progresso',
                 'titleTextStyle' => [
                     'color'    => '#eb6b2c',
                     'fontSize' => 14
