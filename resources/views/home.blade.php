@@ -20,6 +20,7 @@
 @piechart('anosAlunos','anosAlunos')
 @piechart('sexoAlunos','sexoAlunos')
 @piechart('precosCursos','precosCursos')
+@piechart('instrutorCursos','instrutorCursos')
 @endpush
 
 @section('content')
@@ -216,6 +217,7 @@
                             <div id="geralContent" class="collapse show" role="tabpanel" aria-labelledby="geralHeader">
                                 <div class="card-body">
                                     <div id="precosCursos"></div>
+                                    <div id="instrutorCursos"></div>
                                 </div>
                             </div>
                         </div>

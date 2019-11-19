@@ -477,6 +477,28 @@ class HomeController extends Controller
             ],
         ]);
 
+        $instrutores = Instrutor::with('cursos')->get();
+
+        $data = [];
+        foreach ($instrutores as $instrutor) {
+            $data[$instrutor->cursos->count()] = isset($data[$instrutor->cursos->count()]) ? $data[$instrutor->cursos->count()]+1 : 0;
+        }
+        arsort($data);
+
+        $dataTable = Lava::DataTable();
+        $dataTable->addStringColumn('Quantidade de Cursos')
+                ->addNumberColumn('Quantidade de Instrutores');
+        foreach ($data as $cursos => $instrutores) {
+            $dataTable->addRow([$cursos,$instrutores]);
+        }
+        Lava::PieChart('instrutorCursos', $dataTable, [
+            'title' => 'Quantidade de Instrutores para cada Quantidade de Cursos',
+            'titleTextStyle' => [
+                'color'    => '#eb6b2c',
+                'fontSize' => 14
+            ],
+        ]);
+
         return view('home',[
             'avaliacoesCursos' => $avaliacoesCursos,
             'matriculasCursos' => $matriculasCursos,

@@ -6,33 +6,35 @@
 * [x] Importar Cursos (?)
 * [ ] Base de dados de avaliações
     * [x] Collapse e Sortable nos gráficos gerais e de cada curso
-    * [ ] Gráfico de barras geral comparando a média total de cada curso
-    * [ ] Gráfico de barras geral comparando a quantidade de avaliações e comentários de cada curso
-    * [ ] Gráfico de área mensal para cada curso com as médias ponderadas de avaliações acumuladas, usando o percentual de progresso do aluno como peso para cada avaliação e um gráfico de barras com a média do mês dois gráficos de linhas com o desvio padrão para baixo e para cima, demonstrando o grau de variação dos alunos que avaliaram
-    * [ ] Gráfico de área mensal para cada curso com a quantidade de avaliações e comentários
+    * [x] Gráfico de barras geral comparando a média total de cada curso
+    * [x] Gráfico de barras geral comparando a quantidade de avaliações e comentários de cada curso
+    * [x] Gráfico de área mensal para cada curso com a quantidade de avaliações e comentários
+    * [x] Gráfico de área mensal para cada curso com as médias de avaliações acumuladas
+    * [x] Acrescentar um gráfico de barras com a média do mês
+    * [x] Acrescentar dois gráficos de linhas com o desvio padrão para baixo e para cima, demonstrando o grau de variação dos alunos que avaliaram
+    * [ ] Ponderar as médias de avaliações acumuladas, usando o percentual de progresso do aluno como peso para cada avaliação
 * [ ] Base de dados de matrículas e aulas assistidas
     * [x] Collapse e Sortable nos gráficos gerais e de cada curso
-    * [ ] Gráfico de barras Geral comparando a média de percentuais de progresso
-    * [ ] Gráfico de barras Geral comparando a soma de horas assistidas, multiplicando o tempo total do curso e o percentual de progresso
-    * [ ] Gráfico de barras Geral comparando a soma de perguntas feitas + perguntas respondidas
-    * [ ] Gráfico de área mensal para cada curso com a quantidade de perguntas feitas + perguntas respondidas divididas pela quantidade de dias entre a data de inicio e a data final, com um gráfico de barras com a quantidade de cada mês
-    * [ ] Gráfico de área mensal para cada curso com o percentual de progresso dividido pela quantidade de dias entre a data de inicio e a data final, com um gráfico de barras com a quantidade de cada mês
+    * [x] Gráfico de barras Geral comparando a média de percentuais de progresso
+    * [x] Gráfico de barras Geral comparando a soma de perguntas feitas + perguntas respondidas
+    * [x] Gráfico de área mensal para cada curso com a quantidade de perguntas feitas + perguntas respondidas divididas pela quantidade de dias entre a data de inicio e a data final, com um gráfico de barras com a quantidade de cada mês
+    * [x] Gráfico de área mensal para cada curso com o percentual de progresso dividido pela quantidade de dias entre a data de inicio e a data final, com um gráfico de barras com a quantidade de cada mês
     * [ ] Gráfico de área mensal para cada curso com a quantiodade de horas assistidas, multiplicando o tempo total do curso e o percentual de progresso, dividido pela quantidade de dias entre a data de inicio e a data final, com um gráfico de barras com a quantidade de cada mês
+    * [ ] Gráfico de barras Geral comparando a soma de horas assistidas, multiplicando o tempo total do curso e o percentual de progresso
 * [ ] Base de dados de Diplomas
     * [x] Collapse e Sortable nos gráficos gerais e de cada curso
     * [ ] Gráfico de barras Geral comparando a quantidade de inscritos que desistiram do curso último acesso a mais de um mês, quantidade de inscritos que não completaram o curso, inscritos que completaram, mas não tiraram diploma, diplomas emitidos por curso
     * [ ] Gráfico de área mensal para cada curso com a quantidade de inscritos que desistiram do curso último acesso a mais de um mês, quantidade de inscritos que não completaram o curso, inscritos que completaram, mas não tiraram diploma, diplomas emitidos por curso
 * [ ] Base de dados de alunos
-    * [ ] Gráfico de pizza comparando a quantidade de alunos de cada nível de ensino
-    * [ ] Gráfico de pizza comparando a quantidade de alunos de idade
+    * [x] Gráfico de pizza comparando a quantidade de alunos de cada nível de ensino
+    * [x] Gráfico de pizza comparando a quantidade de alunos por idade
     * [ ] Definir sexo através do nome
-    * [ ] Gráfico de pizza comparando a quantidade de alunos de sexo
-* [ ] Base de dados de cursos da Udemy
-    * [ ] Contar quantos cursos existem
-    * [ ] Dividir por faixa de preço
-    * [ ] Dividir por instrutor
+    * [x] Gráfico de pizza comparando a quantidade de alunos de sexo
+* [x] Base de dados de cursos da Udemy
+    * [x] Dividir por faixa de preço
+    * [x] Dividir por instrutores pela quantidade de cursos
 * [ ] Cruzar dados
-    * [ ] Gerar cadastro de Instrutores (nome)
-    * [ ] Gerar cadastro de Curso (nome, instrutor, carga horaria, valor)
+    * [x] Gerar cadastro de Instrutores (nome)
+    * [ ] Gerar cadastro de Curso (nome, carga horaria, valor)
     * [ ] Gerar cadastro de Aluno (nome, nascimento, sexo, escolaridade)
     * [ ] Relacionar Aluno com Curso (inscricao, ultimo acesso, avaliacao, comentario, progresso, perguntas feitas, perguntas respondidas, diploma)
