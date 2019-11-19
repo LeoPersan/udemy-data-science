@@ -248,9 +248,63 @@ class HomeController extends Controller
         ]);
 
         $diplomasCursos = Diploma::distinct()->get('curso')->map(function ($curso) {
+            $curso->diplomas = Diploma::whereCurso($curso->curso)->get();
+            $curso->desistentes = $curso->incompletos = $curso->completos = $curso->diplomados = 0;
+
+            $curso->meses = [];
+            $curso->diplomas->map(function ($diploma) use (&$curso) {
+                $meses = $curso->meses;
+                $mes = date('Y-m',strtotime($diploma->data));
+                if (!isset($meses[$mes])) {
+                    $meses[$mes] = [
+                        'desistentes' => 0,
+                        'incompletos' => 0,
+                        'completos' => 0,
+                        'diplomados' => 0,
+                    ];
+                }
+                $meses[$mes]['diplomados']++;
+                $curso->meses = $meses;
+                return $diploma;
+            });
+
+            $desistentes = 0;
+            $incompletos = 0;
+            $completos = 0;
+            $diplomados = 0;
+            foreach ($curso->meses as $mes => $alunos) {
+                $desistentes += $alunos['desistentes'];
+                $incompletos += $alunos['incompletos'];
+                $completos += $alunos['completos'];
+                $diplomados += $alunos['diplomados'];
+            }
+
+            $curso->desistentes = $desistentes;
+            $curso->incompletos = $incompletos;
+            $curso->completos = $completos;
+            $curso->diplomados = $diplomados;
 
             return $curso;
+        })->sort(function ($a,$b){
+            return $a->diplomados<$b->diplomados;
         });
+
+        $dataTable = Lava::DataTable();
+        $dataTable->addStringColumn('Cursos')
+                ->addNumberColumn('Desistiram')
+                ->addNumberColumn('Não Concluido')
+                ->addNumberColumn('Concluido')
+                ->addNumberColumn('Diploma');
+        foreach ($diplomasCursos as $curso) {
+            $dataTable->addRow([$curso->curso,$curso->desistentes,$curso->incompletos,$curso->completos,$curso->diplomados]);
+        }
+        Lava::ColumnChart('statusAlunos', $dataTable, [
+            'title' => 'Quantidade de alunos por status',
+            'titleTextStyle' => [
+                'color'    => '#eb6b2c',
+                'fontSize' => 14
+            ],
+        ]);
 
         return view('home',[
             'avaliacoesCursos' => $avaliacoesCursos,
