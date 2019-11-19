@@ -6,6 +6,7 @@
 @areachart(str_slug($curso->curso).'QtdeAvaliacoes', str_slug($curso->curso).'QtdeAvaliacoes')
 @combochart(str_slug($curso->curso).'MediaAvaliacoes', str_slug($curso->curso).'MediaAvaliacoes')
 @endforeach
+@columnchart('mediaProgresso','mediaProgresso')
 @endpush
 
 @section('content')
@@ -75,6 +76,28 @@
                             </div>
                         </div>
                         @endforeach
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Matrículas</div>
+                <div class="card-body">
+                    <div id="matriculas" role="tablist" aria-multiselectable="true">
+                        <div class="card">
+                            <div class="card-header" role="tab" id="geralHeader">
+                                <h5 class="mb-0">
+                                    <a data-toggle="collapse" data-parent="#matriculas" href="#geralContent"
+                                        aria-expanded="true" aria-controls="geralContent">
+                                        Geral
+                                    </a>
+                                </h5>
+                            </div>
+                            <div id="geralContent" class="collapse show" role="tabpanel" aria-labelledby="geralHeader">
+                                <div class="card-body">
+                                    <div id="mediaProgresso"></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

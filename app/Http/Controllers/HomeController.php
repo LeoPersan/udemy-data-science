@@ -132,10 +132,31 @@ class HomeController extends Controller
 
         $matriculasCursos = Matricula::distinct()->get('curso')->map(function ($curso) {
             $curso->matriculas = Matricula::whereCurso($curso->curso)->get();
+            $curso->media_progresso = 0;
+            $curso->matriculas->map(function ($matricula) use (&$curso) {
+                $curso->media_progresso += $matricula->progresso;
+                return $matricula;
+            });
+            $curso->media_progresso /= $curso->matriculas->count();
+
             return $curso;
         })->sort(function ($a,$b) {
             return $a->media_progresso < $b->media_progresso;
         });
+
+        $dataTable = Lava::DataTable();
+        $dataTable->addStringColumn('Cursos')
+                ->addNumberColumn('Média de Progresso');
+        foreach ($matriculasCursos as $curso) {
+            $dataTable->addRow([$curso->curso,$curso->media_progresso]);
+        }
+        Lava::ColumnChart('mediaProgresso', $dataTable, [
+            'title' => 'Média de Progressos',
+            'titleTextStyle' => [
+                'color'    => '#eb6b2c',
+                'fontSize' => 14
+            ],
+        ]);
 
         $diplomasCursos = Diploma::distinct()->get('curso')->map(function ($curso) {
 
