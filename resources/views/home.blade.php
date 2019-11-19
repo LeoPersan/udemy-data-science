@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @push('scripts')
 @columnchart('mediaAvaliacoes', 'mediaAvaliacoes')
+@columnchart('qtdeAvaliacoes', 'qtdeAvaliacoes')
 @endpush
 
 @section('content')
@@ -46,6 +47,7 @@
                             <div id="geralContent" class="collapse show" role="tabpanel" aria-labelledby="geralHeader">
                                 <div class="card-body">
                                     <div id="mediaAvaliacoes"></div>
+                                    <div id="qtdeAvaliacoes"></div>
                                 </div>
                             </div>
                         </div>

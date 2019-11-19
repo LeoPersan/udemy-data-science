@@ -25,6 +25,10 @@ class HomeController extends Controller
             $curso->qtde_avaliacoes = $curso->sum_avaliacoes = 0;
 
             Avaliacao::whereCurso($curso->curso)->get()->map(function ($avaliacao) use (&$curso) {
+
+                if (!is_null($avaliacao->comentario)) {
+                    $curso->qtde_comentarios++;
+                }
                 $curso->qtde_avaliacoes++;
 
                 $curso->media += $avaliacao->avaliacao;
@@ -45,6 +49,21 @@ class HomeController extends Controller
         }
         Lava::ColumnChart('mediaAvaliacoes', $dataTable, [
             'title' => 'Média das Avaliações',
+            'titleTextStyle' => [
+                'color'    => '#eb6b2c',
+                'fontSize' => 14
+            ],
+        ]);
+
+        $dataTable = Lava::DataTable();
+        $dataTable->addStringColumn('Cursos')
+                ->addNumberColumn('Avaliações')
+                ->addNumberColumn('Comentários');
+        foreach ($avaliacoesCursos as $curso) {
+            $dataTable->addRow([$curso->curso,$curso->qtde_avaliacoes,$curso->qtde_comentarios]);
+        }
+        Lava::ColumnChart('qtdeAvaliacoes', $dataTable, [
+            'title' => 'Quantidade de Avaliações e Comentários',
             'titleTextStyle' => [
                 'color'    => '#eb6b2c',
                 'fontSize' => 14
