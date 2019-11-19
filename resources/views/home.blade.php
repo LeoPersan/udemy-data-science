@@ -17,6 +17,7 @@
 @areachart(str_slug($curso->curso).'StatusAlunos', str_slug($curso->curso).'StatusAlunos')
 @endforeach
 @piechart('formacaoAlunos','formacaoAlunos')
+@piechart('anosAlunos','anosAlunos')
 @endpush
 
 @section('content')
@@ -189,6 +190,7 @@
                             <div id="geralContent" class="collapse show" role="tabpanel" aria-labelledby="geralHeader">
                                 <div class="card-body">
                                     <div id="formacaoAlunos"></div>
+                                    <div id="anosAlunos"></div>
                                 </div>
                             </div>
                         </div>

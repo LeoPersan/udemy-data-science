@@ -341,6 +341,62 @@ class HomeController extends Controller
             ],
         ]);
 
+        list($min,$max) = [Aluno::min('ano'),Aluno::max('ano')];
+        $anos = [];
+        foreach (range($min,$max) as $ano) {
+            $anos[$ano] = Aluno::whereAno($ano)->count();
+        }
+        $tamanho = floor(count($anos)/2.8);
+
+        $maiorsoma = 0;
+        $melhorano = 0;
+        foreach (array_keys($anos) as $ano) {
+            $soma = 0;
+            for ($i=$ano; $i < $ano+$tamanho; $i++) { 
+                if (!isset($anos[$i])) break;
+                $soma += $anos[$i];
+            }
+            if ($soma > $maiorsoma) {
+                $maiorsoma = $soma;
+                $melhorano = $ano;
+            }
+        }
+
+        $ano = array_keys($anos)[0];
+        $i = 0;
+        while ($ano < $melhorano-($tamanho*$i)) $i++;
+        $ano = $melhorano-($tamanho*$i);
+
+        $partes = [];
+        $tamanho--;
+        while (max(array_keys($anos)) > $ano) {
+            for ($i=0; $i <= $tamanho; $i++) {
+                if ($i == 0) {
+                    $novo = $ano+$tamanho > $max ? $max : $ano+$tamanho;
+                    $velho = $ano < $min ? $min : $ano;
+                    $parte = (date('Y')-$novo).'-'.(date('Y')-$velho);
+                    $partes[$parte] = 0;
+                }
+                $partes[$parte] += isset($anos[$ano]) ? $anos[$ano] : 0;
+                $ano++;
+            }
+        }
+        arsort($partes);
+
+        $dataTable = Lava::DataTable();
+        $dataTable->addStringColumn('Idade')
+                ->addNumberColumn('Alunos');
+        foreach ($partes as $parte => $qtde) {
+            $dataTable->addRow([$parte,$qtde]);
+        }
+        Lava::PieChart('anosAlunos', $dataTable, [
+            'title' => 'Quantidade de alunos por idade',
+            'titleTextStyle' => [
+                'color'    => '#eb6b2c',
+                'fontSize' => 14
+            ],
+        ]);
+
         return view('home',[
             'avaliacoesCursos' => $avaliacoesCursos,
             'matriculasCursos' => $matriculasCursos,
