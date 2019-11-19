@@ -27,6 +27,7 @@ class HomeController extends Controller
 
             Avaliacao::whereCurso($curso->curso)->get()->map(function ($avaliacao) use (&$curso) {
                 $quantidades = $curso->quantidades;
+                $medias = $curso->medias;
                 $mes = date('Y-m',strtotime($avaliacao->data));
 
                 if (!isset($quantidades[$mes])) {
@@ -39,8 +40,11 @@ class HomeController extends Controller
                 $curso->qtde_avaliacoes++;
                 $quantidades[$mes]['avaliacoes']++;
 
+                $medias[$mes][] = $avaliacao->avaliacao;
+
                 $curso->media += $avaliacao->avaliacao;
                 $curso->quantidades = $quantidades;
+                $curso->medias = $medias;
             });
             
             $curso->media = $curso->media/$curso->qtde_avaliacoes;
@@ -58,6 +62,38 @@ class HomeController extends Controller
                     'color'    => '#eb6b2c',
                     'fontSize' => 14
                 ],
+            ]);
+
+            $dataTable = Lava::DataTable();
+            $dataTable->addStringColumn('Mês')
+                    ->addNumberColumn('Média Acumulada')
+                    ->addNumberColumn('Média Mensal')
+                    ->addNumberColumn('Desvio Min.')
+                    ->addNumberColumn('Desvio Max.');
+            $avaliacoes = [];
+            foreach ($curso->medias as $mes => $av) {
+                $avaliacoes = array_merge($avaliacoes, $av);
+                $media = array_sum($avaliacoes)/(count($avaliacoes)?:1);
+                $desvios = [];
+                foreach ($avaliacoes as $avaliacao) {
+                    $desvio = $media-$avaliacao;
+                    $desvios[] = $desvio < 0 ? -$desvio : $desvio;
+                }
+                $desvio_padrao = array_sum($desvios)/(count($desvios)?:1);
+                $dataTable->addRow([$mes, $media, array_sum($av)/(count($av)?:1), $media-$desvio_padrao, $media+$desvio_padrao]);
+            }
+            Lava::ComboChart(str_slug($curso->curso).'MediaAvaliacoes', $dataTable, [
+                'title' => 'Média das Avaliações',
+                'titleTextStyle' => [
+                    'color'    => '#eb6b2c',
+                    'fontSize' => 14
+                ],
+                'series' => [
+                    0 => ['type' => 'area'],
+                    1 => ['type' => 'columns'],
+                    2 => ['type' => 'line'],
+                    3 => ['type' => 'line']
+                ]
             ]);
 
             return $curso;

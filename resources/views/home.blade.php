@@ -4,6 +4,7 @@
 @columnchart('qtdeAvaliacoes', 'qtdeAvaliacoes')
 @foreach ($avaliacoesCursos as $curso)
 @areachart(str_slug($curso->curso).'QtdeAvaliacoes', str_slug($curso->curso).'QtdeAvaliacoes')
+@combochart(str_slug($curso->curso).'MediaAvaliacoes', str_slug($curso->curso).'MediaAvaliacoes')
 @endforeach
 @endpush
 
@@ -69,6 +70,7 @@
                                 aria-labelledby="{{str_slug($curso->curso)}}Header">
                                 <div class="card-body">
                                     <div id="{{str_slug($curso->curso)}}QtdeAvaliacoes"></div>
+                                    <div id="{{str_slug($curso->curso)}}MediaAvaliacoes"></div>
                                 </div>
                             </div>
                         </div>
