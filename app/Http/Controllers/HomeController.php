@@ -421,6 +421,62 @@ class HomeController extends Controller
             ],
         ]);
 
+        list($min,$max) = [floor(Curso::min('preco')),ceil(Curso::max('preco'))];
+        $precos = [];
+        foreach (range($min,$max) as $preco) {
+            $precos[$preco] = Curso::where('preco','like',$preco.'%')->count();
+        }
+        $tamanho = floor(count($precos)/5);
+
+        $maiorsoma = 0;
+        $melhorpreco = 0;
+        foreach (array_keys($precos) as $preco) {
+            $soma = 0;
+            for ($i=$preco; $i < $preco+$tamanho; $i++) { 
+                if (!isset($precos[$i])) break;
+                $soma += $precos[$i];
+            }
+            if ($soma > $maiorsoma) {
+                $maiorsoma = $soma;
+                $melhorpreco = $preco;
+            }
+        }
+
+        $preco = array_keys($precos)[0];
+        $i = 0;
+        while ($preco < $melhorpreco-($tamanho*$i)) $i++;
+        $preco = $melhorpreco-($tamanho*$i);
+
+        $partes = [];
+        $tamanho--;
+        while (max(array_keys($precos)) > $preco) {
+            for ($i=0; $i <= $tamanho; $i++) {
+                if ($i == 0) {
+                    $caro = $preco+$tamanho > $max ? $max : $preco+$tamanho;
+                    $barato = $preco < $min ? $min : $preco;
+                    $parte = $barato.'-'.$caro;
+                    $partes[$parte] = 0;
+                }
+                $partes[$parte] += isset($precos[$preco]) ? $precos[$preco] : 0;
+                $preco++;
+            }
+        }
+        arsort($partes);
+
+        $dataTable = Lava::DataTable();
+        $dataTable->addStringColumn('Preço')
+                ->addNumberColumn('Cursos');
+        foreach ($partes as $parte => $qtde) {
+            $dataTable->addRow([$parte,$qtde]);
+        }
+        Lava::PieChart('precosCursos', $dataTable, [
+            'title' => 'Quantidade de Cursos por preço',
+            'titleTextStyle' => [
+                'color'    => '#eb6b2c',
+                'fontSize' => 14
+            ],
+        ]);
+
         return view('home',[
             'avaliacoesCursos' => $avaliacoesCursos,
             'matriculasCursos' => $matriculasCursos,

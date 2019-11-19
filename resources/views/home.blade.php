@@ -19,6 +19,7 @@
 @piechart('formacaoAlunos','formacaoAlunos')
 @piechart('anosAlunos','anosAlunos')
 @piechart('sexoAlunos','sexoAlunos')
+@piechart('precosCursos','precosCursos')
 @endpush
 
 @section('content')
@@ -193,6 +194,28 @@
                                     <div id="formacaoAlunos"></div>
                                     <div id="anosAlunos"></div>
                                     <div id="sexoAlunos"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Cursos</div>
+                <div class="card-body">
+                    <div id="cursos" role="tablist" aria-multiselectable="true">
+                        <div class="card">
+                            <div class="card-header" role="tab" id="geralHeader">
+                                <h5 class="mb-0">
+                                    <a data-toggle="collapse" data-parent="#cursos" href="#geralContent"
+                                        aria-expanded="true" aria-controls="geralContent">
+                                        Geral
+                                    </a>
+                                </h5>
+                            </div>
+                            <div id="geralContent" class="collapse show" role="tabpanel" aria-labelledby="geralHeader">
+                                <div class="card-body">
+                                    <div id="precosCursos"></div>
                                 </div>
                             </div>
                         </div>
