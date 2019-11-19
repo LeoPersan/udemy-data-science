@@ -320,6 +320,27 @@ class HomeController extends Controller
             ],
         ]);
 
+        $formacoes = Aluno::distinct()->get('formacao')->map(function ($formacao) {
+            $formacao->alunos = Aluno::whereFormacao($formacao->formacao)->count();
+            return $formacao;
+        })->sort(function ($a,$b) {
+            return $a->alunos < $b->alunos;
+        });
+
+        $dataTable = Lava::DataTable();
+        $dataTable->addStringColumn('Formação')
+                ->addNumberColumn('Alunos');
+        foreach ($formacoes as $formacao) {
+            $dataTable->addRow([$formacao->formacao,$formacao->alunos]);
+        }
+        Lava::PieChart('formacaoAlunos', $dataTable, [
+            'title' => 'Quantidade de alunos por formação',
+            'titleTextStyle' => [
+                'color'    => '#eb6b2c',
+                'fontSize' => 14
+            ],
+        ]);
+
         return view('home',[
             'avaliacoesCursos' => $avaliacoesCursos,
             'matriculasCursos' => $matriculasCursos,
