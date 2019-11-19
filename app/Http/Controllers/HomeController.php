@@ -268,6 +268,12 @@ class HomeController extends Controller
                 return $diploma;
             });
 
+            $dataTable = Lava::DataTable();
+            $dataTable->addStringColumn('Mês')
+                    ->addNumberColumn('Desistiram')
+                    ->addNumberColumn('Não Concluido')
+                    ->addNumberColumn('Concluido')
+                    ->addNumberColumn('Diploma');
             $desistentes = 0;
             $incompletos = 0;
             $completos = 0;
@@ -277,7 +283,15 @@ class HomeController extends Controller
                 $incompletos += $alunos['incompletos'];
                 $completos += $alunos['completos'];
                 $diplomados += $alunos['diplomados'];
+                $dataTable->addRow([$mes,$desistentes,$incompletos,$completos,$diplomados]);
             }
+            Lava::AreaChart(str_slug($curso->curso).'StatusAlunos', $dataTable, [
+                'title' => 'Quantidade de alunos por status',
+                'titleTextStyle' => [
+                    'color'    => '#eb6b2c',
+                    'fontSize' => 14
+                ],
+            ]);
 
             $curso->desistentes = $desistentes;
             $curso->incompletos = $incompletos;

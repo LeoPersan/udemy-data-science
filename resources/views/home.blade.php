@@ -13,6 +13,9 @@
 @combochart(str_slug($curso->curso).'MediaProgresso', str_slug($curso->curso).'MediaProgresso')
 @endforeach
 @columnchart('statusAlunos','statusAlunos')
+@foreach ($diplomasCursos as $curso)
+@areachart(str_slug($curso->curso).'StatusAlunos', str_slug($curso->curso).'StatusAlunos')
+@endforeach
 @endpush
 
 @section('content')
@@ -147,6 +150,25 @@
                                 </div>
                             </div>
                         </div>
+                        @foreach ($diplomasCursos as $curso)
+                        <div class="card">
+                            <div class="card-header" role="tab" id="{{str_slug($curso->curso)}}Header">
+                                <h5 class="mb-0">
+                                    <a data-toggle="collapse" data-parent="#diplomas"
+                                        href="#{{str_slug($curso->curso)}}Content" aria-expanded="false"
+                                        aria-controls="{{str_slug($curso->curso)}}Content">
+                                        {{$curso->curso}}
+                                    </a>
+                                </h5>
+                            </div>
+                            <div id="{{str_slug($curso->curso)}}Content" class="collapse show" role="tabpanel"
+                                aria-labelledby="{{str_slug($curso->curso)}}Header">
+                                <div class="card-body">
+                                    <div id="{{str_slug($curso->curso)}}StatusAlunos"></div>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
