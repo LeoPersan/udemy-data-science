@@ -23,6 +23,10 @@ class Avaliacao extends Model
     {
         parent::boot();
 
+        static::addGlobalScope('order', function (Builder $builder) {
+            return $builder->orderBy('data');
+        });
+
         static::addGlobalScope('permission', function (Builder $builder) {
             return $builder->whereUserId(auth()->user()->id);
         });
