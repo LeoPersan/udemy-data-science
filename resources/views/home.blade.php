@@ -6,6 +6,7 @@
 @areachart(str_slug($curso->curso).'QtdeAvaliacoes', str_slug($curso->curso).'QtdeAvaliacoes')
 @combochart(str_slug($curso->curso).'MediaAvaliacoes', str_slug($curso->curso).'MediaAvaliacoes')
 @endforeach
+@columnchart('totalPerguntas','totalPerguntas')
 @columnchart('mediaProgresso','mediaProgresso')
 @endpush
 
@@ -95,6 +96,7 @@
                             <div id="geralContent" class="collapse show" role="tabpanel" aria-labelledby="geralHeader">
                                 <div class="card-body">
                                     <div id="mediaProgresso"></div>
+                                    <div id="totalPerguntas"></div>
                                 </div>
                             </div>
                         </div>

@@ -132,9 +132,11 @@ class HomeController extends Controller
 
         $matriculasCursos = Matricula::distinct()->get('curso')->map(function ($curso) {
             $curso->matriculas = Matricula::whereCurso($curso->curso)->get();
-            $curso->media_progresso = 0;
+            $curso->media_progresso = $curso->total_perguntas = 0;
             $curso->matriculas->map(function ($matricula) use (&$curso) {
                 $curso->media_progresso += $matricula->progresso;
+                $perguntas = $matricula->perguntas_feitas+$matricula->perguntas_respondidas;
+                $curso->total_perguntas += $perguntas;
                 return $matricula;
             });
             $curso->media_progresso /= $curso->matriculas->count();
@@ -152,6 +154,20 @@ class HomeController extends Controller
         }
         Lava::ColumnChart('mediaProgresso', $dataTable, [
             'title' => 'Média de Progressos',
+            'titleTextStyle' => [
+                'color'    => '#eb6b2c',
+                'fontSize' => 14
+            ],
+        ]);
+
+        $dataTable = Lava::DataTable();
+        $dataTable->addStringColumn('Cursos')
+                ->addNumberColumn('Perguntas');
+        foreach ($matriculasCursos as $curso) {
+            $dataTable->addRow([$curso->curso,$curso->total_perguntas]);
+        }
+        Lava::ColumnChart('totalPerguntas', $dataTable, [
+            'title' => 'Total de Perguntas',
             'titleTextStyle' => [
                 'color'    => '#eb6b2c',
                 'fontSize' => 14
