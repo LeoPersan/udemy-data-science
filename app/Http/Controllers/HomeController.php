@@ -133,13 +133,54 @@ class HomeController extends Controller
         $matriculasCursos = Matricula::distinct()->get('curso')->map(function ($curso) {
             $curso->matriculas = Matricula::whereCurso($curso->curso)->get();
             $curso->media_progresso = $curso->total_perguntas = 0;
+            $curso->qtde_perguntas = [];
             $curso->matriculas->map(function ($matricula) use (&$curso) {
                 $curso->media_progresso += $matricula->progresso;
                 $perguntas = $matricula->perguntas_feitas+$matricula->perguntas_respondidas;
                 $curso->total_perguntas += $perguntas;
+
+                $qtde_perguntas = $curso->qtde_perguntas;
+                if (!in_array(null,[$matricula->inicio,$matricula->ult_acesso])) {
+                    $mes = date('Y-m-01',strtotime('-1 month',strtotime($matricula->inicio)));
+                    $mes_fim = date('Y-m-01',strtotime($matricula->ult_acesso));
+                    $meses = [];
+                    do {
+                        $mes = date('Y-m-01',strtotime('+1 month',strtotime($mes)));
+                        $meses[] = date('Y-m',strtotime($mes));
+                    } while ($mes != $mes_fim);
+                    
+                    while ($perguntas > 0) {
+                        $media_perguntas = floor($perguntas/(count($meses)?:1));
+                        $perguntas -= $media_perguntas;
+                        $mes = array_shift($meses);
+                        $qtde_perguntas[$mes] = isset($qtde_perguntas[$mes]) ? $qtde_perguntas[$mes]+$media_perguntas : $media_perguntas;
+                    }
+                    $curso->qtde_perguntas = $qtde_perguntas;
+                }
                 return $matricula;
             });
             $curso->media_progresso /= $curso->matriculas->count();
+
+            $dataTable = Lava::DataTable();
+            $dataTable->addStringColumn('Mês')
+                    ->addNumberColumn('Perguntas Acumuladas')
+                    ->addNumberColumn('Perguntas');
+            $quantidadeAcumulada = 0;
+            foreach ($curso->qtde_perguntas as $mes => $quantidade) {
+                $quantidadeAcumulada += $quantidade;
+                $dataTable->addRow([$mes, $quantidadeAcumulada, $quantidade]);
+            }
+            Lava::ComboChart(str_slug($curso->curso).'QtdePerguntas', $dataTable, [
+                'title' => 'Qtde de Perguntas',
+                'titleTextStyle' => [
+                    'color'    => '#eb6b2c',
+                    'fontSize' => 14
+                ],
+                'series' => [
+                    0 => ['type' => 'area'],
+                    1 => ['type' => 'columns'],
+                ]
+            ]);
 
             return $curso;
         })->sort(function ($a,$b) {
