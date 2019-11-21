@@ -397,14 +397,10 @@ class HomeController extends Controller
             ],
         ]);
 
-        $alunos = Aluno::orderBy('estudante')->get('estudante');
-
-        $sexos = ['Masculino' => 0, 'Feminino' => 0, 'Bug' => 0];
-        foreach ($alunos as $aluno) {
-            if (preg_match('/[a]$/',$aluno->estudante)) $sexos['Feminino']++;
-            elseif (preg_match('/[ou]$/',$aluno->estudante)) $sexos['Masculino']++;
-            else $sexos['Bug']++;
-        }
+        $sexos = [
+            'Masculino' => Aluno::whereSexo('M')->count(),
+            'Feminino' => Aluno::whereSexo('F')->count()
+        ];
         arsort($sexos);
 
         $dataTable = Lava::DataTable();

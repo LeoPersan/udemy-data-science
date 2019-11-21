@@ -28,7 +28,7 @@
 * [ ] Base de dados de alunos
     * [x] Gráfico de pizza comparando a quantidade de alunos de cada nível de ensino
     * [x] Gráfico de pizza comparando a quantidade de alunos por idade
-    * [ ] Definir sexo através do nome
+    * [x] Definir sexo através do nome
     * [x] Gráfico de pizza comparando a quantidade de alunos de sexo
 * [x] Base de dados de cursos da Udemy
     * [x] Dividir por faixa de preço
