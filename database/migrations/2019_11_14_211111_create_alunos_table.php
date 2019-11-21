@@ -19,6 +19,7 @@ class CreateAlunosTable extends Migration
             $table->string('estudante');
             $table->integer('ano');
             $table->string('formacao');
+            $table->string('sexo');
             $table->timestamps();
             $table->foreign('user_id')->on('users')->references('id')->onDelete('cascade')->onUpdate('cascade');
         });

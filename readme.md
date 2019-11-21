@@ -35,6 +35,6 @@
     * [x] Dividir por instrutores pela quantidade de cursos
 * [ ] Cruzar dados
     * [x] Gerar cadastro de Instrutores (nome)
-    * [ ] Gerar cadastro de Curso (nome, carga horaria, valor)
-    * [ ] Gerar cadastro de Aluno (nome, nascimento, sexo, escolaridade)
+    * [x] Gerar cadastro de Curso (nome, carga horaria, valor)
+    * [x] Gerar cadastro de Aluno (nome, nascimento, sexo, escolaridade)
     * [ ] Relacionar Aluno com Curso (inscricao, ultimo acesso, avaliacao, comentario, progresso, perguntas feitas, perguntas respondidas, diploma)

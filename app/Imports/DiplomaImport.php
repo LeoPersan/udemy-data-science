@@ -2,6 +2,7 @@
 
 namespace App\Imports;
 
+use App\Models\Curso;
 use App\Models\Diploma;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithCustomCsvSettings;
@@ -16,6 +17,9 @@ class DiplomaImport implements ToModel, WithCustomCsvSettings, WithHeadingRow
     */
     public function model(array $row)
     {
+        $curso = Curso::firstOrNew(['user_id' => auth()->user()->id,'curso'=>$row['nome_evento']]);
+        $curso->carga_horaria = $this->intCarga($row['carga']);
+        $curso->save();
         return new Diploma([
             'user_id' => auth()->user()->id,
             'curso' => $row['nome_evento'],

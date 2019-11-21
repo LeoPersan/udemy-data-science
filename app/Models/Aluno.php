@@ -12,7 +12,7 @@ class Aluno extends Model
      *
      * @var array
      */
-    protected $fillable = ['user_id','estudante','ano','formacao'];
+    protected $fillable = ['user_id','estudante','ano','formacao','sexo'];
 
     public function user()
     {
