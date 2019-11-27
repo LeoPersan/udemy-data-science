@@ -29,10 +29,10 @@ class Curso extends Model
         return str_slug($this->attributes['curso']);
     }
 
-    public function getMinutosAssistidasAttribute()
+    public function getMinutosAssistidosAttribute()
     {
         return $this->alunos->sum(function ($aluno) {
-            return $aluno->minutosAssistidas;
+            return $aluno->minutosAssistidos;
         });
     }
 

@@ -24,7 +24,7 @@ class Aluno extends Model
         return $this->belongsToMany(Curso::class)->withPivot(['inscricao','ult_acesso','data_avaliacao','avaliacao','comentario','progresso','perguntas_feitas','perguntas_respondidas','diploma']);
     }
 
-    public function getMinutosAssistidasAttribute()
+    public function getMinutosAssistidosAttribute()
     {
         if (!$this->pivot or !$this->pivot->pivotParent->carga_horaria) return false;
         return $this->pivot->pivotParent->carga_horaria/100*$this->pivot->progresso;

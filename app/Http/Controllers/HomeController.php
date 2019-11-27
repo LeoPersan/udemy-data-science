@@ -226,13 +226,33 @@ class HomeController extends Controller
             $dataTable->addStringColumn('Mês')
                     ->addNumberColumn('Progresso Acumulado')
                     ->addNumberColumn('Progresso');
+
+            $dataTable2 = Lava::DataTable();
+            $dataTable2->addStringColumn('Mês')
+                    ->addNumberColumn('Minutos Assistidos Acumulado')
+                    ->addNumberColumn('Minutos Assistidos');
             $progressoAcumulado = [];
             foreach ($curso->progressoMeses as $mes => $progresso) {
                 $progressoAcumulada = array_merge($progressoAcumulado,$progresso);
-                $dataTable->addRow([$mes, array_sum($progressoAcumulada)/(count($progressoAcumulada)?:1), array_sum($progresso)/(count($progresso)?:1)]);
+                $somaProgresso = array_sum($progressoAcumulada)/(count($progressoAcumulada)?:1);
+                $somaProgressoAcumulado = array_sum($progressoAcumulada)/(count($progressoAcumulada)?:1);
+                $dataTable->addRow([$mes, $somaProgressoAcumulado/(count($progressoAcumulada)?:1), $somaProgresso/(count($progresso)?:1)]);
+                $dataTable2->addRow([$mes, $curso->carga_horaria/100*$somaProgressoAcumulado, $curso->carga_horaria/100*$somaProgresso]);
             }
             Lava::ComboChart(str_slug($curso->curso).'MediaProgresso', $dataTable, [
                 'title' => 'Média de Progresso',
+                'titleTextStyle' => [
+                    'color'    => '#eb6b2c',
+                    'fontSize' => 14
+                ],
+                'series' => [
+                    0 => ['type' => 'area'],
+                    1 => ['type' => 'columns'],
+                ]
+            ]);
+
+            Lava::ComboChart(str_slug($curso->curso).'TotalAssistido', $dataTable, [
+                'title' => 'Minutos Assistidos de Progresso',
                 'titleTextStyle' => [
                     'color'    => '#eb6b2c',
                     'fontSize' => 14
