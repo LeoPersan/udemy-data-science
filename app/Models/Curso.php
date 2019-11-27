@@ -19,6 +19,11 @@ class Curso extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function alunos()
+    {
+        return $this->belongsToMany(Aluno::class)->withPivot(['inscricao','ult_acesso','data_avaliacao','avaliacao','comentario','progresso','perguntas_feitas','perguntas_respondidas','diploma']);
+    }
+
     public function getHorasAttribute()
     {
         $horas =  floor($this->attributes['carga_horaria']/60);

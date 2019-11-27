@@ -16,7 +16,7 @@ class AlunoImport implements ToModel, WithCustomCsvSettings, WithHeadingRow
     */
     public function model(array $row)
     {
-        return new Aluno([
+        return Aluno::firstOrNew([
             'user_id' => auth()->user()->id,
             'estudante' => $row['nome'],
             'ano' => $row['ano_nascimento'],

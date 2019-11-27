@@ -510,7 +510,7 @@ class HomeController extends Controller
                     $arquivo->storeAs('public/avaliacoes', 'avaliacao-' . date('Ymd-His') . '-' . uniqid() . '.csv');
                     Excel::import(new AvaliacaoImport(), $arquivo);
                 }
-                if (preg_match('/[^\;]+;[^\;]+;[^\;]+;[^\;]+;[^\;]+;[^\;]+;[^\;]+;/', $arquivo->get())) {
+                if (preg_match('/[^\;]+;Student;Da-ed-Star;it-Vi-Last;Progress%;Questions Asked;Questions Answered;/', $arquivo->get())) {
                     $arquivo->storeAs('public/matriculas', 'matricula-' . date('Ymd-His') . '-' . uniqid() . '.csv');
                     Excel::import(new MatriculaImport(), $arquivo);
                 }

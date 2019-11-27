@@ -19,6 +19,11 @@ class Aluno extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function cursos()
+    {
+        return $this->belongsToMany(Curso::class)->withPivot(['inscricao','ult_acesso','data_avaliacao','avaliacao','comentario','progresso','perguntas_feitas','perguntas_respondidas','diploma']);
+    }
+
     protected static function boot()
     {
         parent::boot();

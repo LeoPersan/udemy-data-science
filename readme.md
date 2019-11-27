@@ -25,7 +25,7 @@
     * [x] Collapse e Sortable nos gráficos gerais e de cada curso
     * [ ] Gráfico de barras Geral comparando a quantidade de inscritos que desistiram do curso último acesso a mais de um mês, quantidade de inscritos que não completaram o curso, inscritos que completaram, mas não tiraram diploma, diplomas emitidos por curso
     * [ ] Gráfico de área mensal para cada curso com a quantidade de inscritos que desistiram do curso último acesso a mais de um mês, quantidade de inscritos que não completaram o curso, inscritos que completaram, mas não tiraram diploma, diplomas emitidos por curso
-* [ ] Base de dados de alunos
+* [x] Base de dados de alunos
     * [x] Gráfico de pizza comparando a quantidade de alunos de cada nível de ensino
     * [x] Gráfico de pizza comparando a quantidade de alunos por idade
     * [x] Definir sexo através do nome
@@ -33,8 +33,10 @@
 * [x] Base de dados de cursos da Udemy
     * [x] Dividir por faixa de preço
     * [x] Dividir por instrutores pela quantidade de cursos
-* [ ] Cruzar dados
+* [x] Cruzar dados
     * [x] Gerar cadastro de Instrutores (nome)
     * [x] Gerar cadastro de Curso (nome, carga horaria, valor)
     * [x] Gerar cadastro de Aluno (nome, nascimento, sexo, escolaridade)
-    * [ ] Relacionar Aluno com Curso (inscricao, ultimo acesso, avaliacao, comentario, progresso, perguntas feitas, perguntas respondidas, diploma)
+    * [x] Relacionar Aluno_Curso com data da avaliação, avaliacao, comentario
+    * [x] Relacionar Aluno_Curso com diploma
+    * [x] Relacionar Aluno_Curso com inscricao, ultimo acesso, progresso, perguntas feitas, perguntas respondidas
