@@ -2,18 +2,18 @@
 @push('scripts')
 @columnchart('mediaAvaliacoes', 'mediaAvaliacoes')
 @columnchart('qtdeAvaliacoes', 'qtdeAvaliacoes')
-@foreach ($avaliacoesCursos as $curso)
+@foreach ($cursosAvaliacoes as $curso)
 @areachart(str_slug($curso->curso).'QtdeAvaliacoes', str_slug($curso->curso).'QtdeAvaliacoes')
 @combochart(str_slug($curso->curso).'MediaAvaliacoes', str_slug($curso->curso).'MediaAvaliacoes')
 @endforeach
 @columnchart('totalPerguntas','totalPerguntas')
 @columnchart('mediaProgresso','mediaProgresso')
-@foreach ($matriculasCursos as $curso)
+@foreach ($cursosMatriculas as $curso)
 @combochart(str_slug($curso->curso).'QtdePerguntas', str_slug($curso->curso).'QtdePerguntas')
 @combochart(str_slug($curso->curso).'MediaProgresso', str_slug($curso->curso).'MediaProgresso')
 @endforeach
 @columnchart('statusAlunos','statusAlunos')
-@foreach ($diplomasCursos as $curso)
+@foreach ($cursosDiplomas as $curso)
 @areachart(str_slug($curso->curso).'StatusAlunos', str_slug($curso->curso).'StatusAlunos')
 @endforeach
 @piechart('formacaoAlunos','formacaoAlunos')
@@ -70,7 +70,7 @@
                                 </div>
                             </div>
                         </div>
-                        @foreach ($avaliacoesCursos as $curso)
+                        @foreach ($cursosAvaliacoes as $curso)
                         <div class="card">
                             <div class="card-header" role="tab" id="{{str_slug($curso->curso)}}Header">
                                 <h5 class="mb-0">
@@ -113,7 +113,7 @@
                                 </div>
                             </div>
                         </div>
-                        @foreach ($matriculasCursos as $curso)
+                        @foreach ($cursosMatriculas as $curso)
                         <div class="card">
                             <div class="card-header" role="tab" id="{{str_slug($curso->curso)}}Header">
                                 <h5 class="mb-0">
@@ -155,7 +155,7 @@
                                 </div>
                             </div>
                         </div>
-                        @foreach ($diplomasCursos as $curso)
+                        @foreach ($cursosDiplomas as $curso)
                         <div class="card">
                             <div class="card-header" role="tab" id="{{str_slug($curso->curso)}}Header">
                                 <h5 class="mb-0">

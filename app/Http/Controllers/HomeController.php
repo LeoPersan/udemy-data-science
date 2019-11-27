@@ -21,82 +21,10 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $avaliacoesCursos = Avaliacao::withoutGlobalScope('order')->distinct()->get('curso')->map(function ($curso) {
-            $curso->quantidades = $curso->medias = [];
-            $curso->qtde_avaliacoes = $curso->sum_avaliacoes = 0;
+        $cursos = Curso::all();
 
-            Avaliacao::whereCurso($curso->curso)->get()->map(function ($avaliacao) use (&$curso) {
-                $quantidades = $curso->quantidades;
-                $medias = $curso->medias;
-                $mes = date('Y-m',strtotime($avaliacao->data));
-
-                if (!isset($quantidades[$mes])) {
-                    $quantidades[$mes] = ['avaliacoes' => 0,'comentarios' => 0];
-                }
-                if (!is_null($avaliacao->comentario)) {
-                    $curso->qtde_comentarios++;
-                    $quantidades[$mes]['comentarios']++;
-                }
-                $curso->qtde_avaliacoes++;
-                $quantidades[$mes]['avaliacoes']++;
-
-                $medias[$mes][] = $avaliacao->avaliacao;
-
-                $curso->media += $avaliacao->avaliacao;
-                $curso->quantidades = $quantidades;
-                $curso->medias = $medias;
-            });
-            
-            $curso->media = $curso->media/$curso->qtde_avaliacoes;
-
-            $dataTable = Lava::DataTable();
-            $dataTable->addStringColumn('Mês')
-                    ->addNumberColumn('Avaliações')
-                    ->addNumberColumn('Comentários');
-            foreach ($curso->quantidades as $mes => $quantidade) {
-                $dataTable->addRow([$mes, $quantidade['avaliacoes'], $quantidade['comentarios']]);
-            }
-            Lava::AreaChart(str_slug($curso->curso).'QtdeAvaliacoes', $dataTable, [
-                'title' => 'Qtde de Avaliações e Comentários',
-                'titleTextStyle' => [
-                    'color'    => '#eb6b2c',
-                    'fontSize' => 14
-                ],
-            ]);
-
-            $dataTable = Lava::DataTable();
-            $dataTable->addStringColumn('Mês')
-                    ->addNumberColumn('Média Acumulada')
-                    ->addNumberColumn('Média Mensal')
-                    ->addNumberColumn('Desvio Min.')
-                    ->addNumberColumn('Desvio Max.');
-            $avaliacoes = [];
-            foreach ($curso->medias as $mes => $av) {
-                $avaliacoes = array_merge($avaliacoes, $av);
-                $media = array_sum($avaliacoes)/(count($avaliacoes)?:1);
-                $desvios = [];
-                foreach ($avaliacoes as $avaliacao) {
-                    $desvio = $media-$avaliacao;
-                    $desvios[] = $desvio < 0 ? -$desvio : $desvio;
-                }
-                $desvio_padrao = array_sum($desvios)/(count($desvios)?:1);
-                $dataTable->addRow([$mes, $media, array_sum($av)/(count($av)?:1), $media-$desvio_padrao, $media+$desvio_padrao]);
-            }
-            Lava::ComboChart(str_slug($curso->curso).'MediaAvaliacoes', $dataTable, [
-                'title' => 'Média das Avaliações',
-                'titleTextStyle' => [
-                    'color'    => '#eb6b2c',
-                    'fontSize' => 14
-                ],
-                'series' => [
-                    0 => ['type' => 'area'],
-                    1 => ['type' => 'columns'],
-                    2 => ['type' => 'line'],
-                    3 => ['type' => 'line']
-                ]
-            ]);
-
-            return $curso;
+        $cursosAvaliacoes = $cursos->filter(function ($curso) {
+            return $curso->avaliacoes->count();
         })->sort(function ($a,$b) {
             return $a->media < $b->media;
         });
@@ -104,7 +32,7 @@ class HomeController extends Controller
         $dataTable = Lava::DataTable();
         $dataTable->addStringColumn('Cursos')
                 ->addNumberColumn('Médias');
-        foreach ($avaliacoesCursos as $curso) {
+        foreach ($cursosAvaliacoes as $curso) {
             $dataTable->addRow([$curso->curso,$curso->media]);
         }
         Lava::ColumnChart('mediaAvaliacoes', $dataTable, [
@@ -119,8 +47,8 @@ class HomeController extends Controller
         $dataTable->addStringColumn('Cursos')
                 ->addNumberColumn('Avaliações')
                 ->addNumberColumn('Comentários');
-        foreach ($avaliacoesCursos as $curso) {
-            $dataTable->addRow([$curso->curso,$curso->qtde_avaliacoes,$curso->qtde_comentarios]);
+        foreach ($cursosAvaliacoes as $curso) {
+            $dataTable->addRow([$curso->curso,$curso->avaliacoes->count(),$curso->comentarios->count()]);
         }
         Lava::ColumnChart('qtdeAvaliacoes', $dataTable, [
             'title' => 'Quantidade de Avaliações e Comentários',
@@ -130,56 +58,98 @@ class HomeController extends Controller
             ],
         ]);
 
-        $matriculasCursos = Matricula::distinct()->get('curso')->map(function ($curso) {
-            $curso->matriculas = Matricula::whereCurso($curso->curso)->get();
-            $curso->media_progresso = $curso->total_perguntas = 0;
-            $curso->qtde_perguntas = $curso->qtde_progressos = [];
-            $curso->matriculas->map(function ($matricula) use (&$curso) {
-                $curso->media_progresso += $matricula->progresso;
-                $perguntas = $matricula->perguntas_feitas+$matricula->perguntas_respondidas;
-                $curso->total_perguntas += $perguntas;
+        foreach ($cursosAvaliacoes as $curso) {
+            $dataTable = Lava::DataTable();
+            $dataTable->addStringColumn('Mês')
+                    ->addNumberColumn('Avaliações')
+                    ->addNumberColumn('Comentários');
+            $dataTable2 = Lava::DataTable();
+            $dataTable2->addStringColumn('Mês')
+                    ->addNumberColumn('Média Acumulada')
+                    ->addNumberColumn('Média Mensal')
+                    ->addNumberColumn('Desvio Min.')
+                    ->addNumberColumn('Desvio Max.');
+            $avaliacoesAcumuladas = [];
+            foreach ($curso->avaliacoesMeses as $mes => $avaliacoes) {
+                $dataTable->addRow([$mes, count($avaliacoes['avaliacoes']), count($avaliacoes['comentarios'])]);
 
-                $qtde_perguntas = $curso->qtde_perguntas;
-                $qtde_progressos = $curso->qtde_progressos;
-                if (!in_array(null,[$matricula->inicio,$matricula->ult_acesso])) {
-                    $mes = date('Y-m-01',strtotime('-1 month',strtotime($matricula->inicio)));
-                    $mes_fim = date('Y-m-01',strtotime($matricula->ult_acesso));
-                    $meses = [];
-                    do {
-                        $mes = date('Y-m-01',strtotime('+1 month',strtotime($mes)));
-                        $meses[] = date('Y-m',strtotime($mes));
-                    } while ($mes != $mes_fim);
-                    
-                    while ($perguntas > 0) {
-                        $media_perguntas = floor($perguntas/(count($meses)?:1));
-                        $perguntas -= $media_perguntas;
-                        $mes = array_shift($meses);
-                        $qtde_perguntas[$mes] = isset($qtde_perguntas[$mes]) ? $qtde_perguntas[$mes]+$media_perguntas : $media_perguntas;
-                    }
-                    $curso->qtde_perguntas = $qtde_perguntas;
-
-                    $meses = array_keys($qtde_perguntas);
-                    $progresso = $matricula->progresso;
-                    while ($progresso > 0) {
-                        $media_progresso = floor($progresso/(count($meses)?:1));
-                        $progresso -= $media_progresso;
-                        $mes = array_shift($meses);
-                        $qtde_progressos[$mes][] = $media_progresso;
-                    }
-                    $curso->qtde_progressos = $qtde_progressos;
+                $avaliacoesAcumuladas = array_merge($avaliacoesAcumuladas, $avaliacoes['avaliacoes']);
+                $media = array_sum($avaliacoesAcumuladas)/(count($avaliacoesAcumuladas)?:1);
+                $desvios = [];
+                foreach ($avaliacoesAcumuladas as $avaliacao) {
+                    $desvio = $media-$avaliacao;
+                    $desvios[] = $desvio < 0 ? -$desvio : $desvio;
                 }
-                return $matricula;
-            });
-            $curso->media_progresso /= $curso->matriculas->count();
+                $desvio_padrao = array_sum($desvios)/(count($desvios)?:1);
+                $dataTable2->addRow([$mes, $media, array_sum($avaliacoes['avaliacoes'])/(count($avaliacoes['avaliacoes'])?:1), $media-$desvio_padrao, $media+$desvio_padrao]);
+            }
 
+            Lava::AreaChart($curso->slug.'QtdeAvaliacoes', $dataTable, [
+                'title' => 'Qtde de Avaliações e Comentários',
+                'titleTextStyle' => [
+                    'color'    => '#eb6b2c',
+                    'fontSize' => 14
+                ],
+            ]);
+
+            Lava::ComboChart(str_slug($curso->curso).'MediaAvaliacoes', $dataTable2, [
+                'title' => 'Média das Avaliações',
+                'titleTextStyle' => [
+                    'color'    => '#eb6b2c',
+                    'fontSize' => 14
+                ],
+                'series' => [
+                    0 => ['type' => 'area'],
+                    1 => ['type' => 'columns'],
+                    2 => ['type' => 'line'],
+                    3 => ['type' => 'line']
+                ]
+            ]);
+        }
+
+        $cursosMatriculas = $cursos->filter(function ($curso) {
+            return $curso->mediaProgresso;
+        })->sort(function ($a,$b) {
+            return $a->mediaProgresso < $b->mediaProgresso;
+        });
+
+        $dataTable = Lava::DataTable();
+        $dataTable->addStringColumn('Cursos')
+                ->addNumberColumn('Média de Progresso');
+        foreach ($cursosMatriculas as $curso) {
+            $dataTable->addRow([$curso->curso,$curso->mediaProgresso]);
+        }
+        Lava::ColumnChart('mediaProgresso', $dataTable, [
+            'title' => 'Média de Progressos',
+            'titleTextStyle' => [
+                'color'    => '#eb6b2c',
+                'fontSize' => 14
+            ],
+        ]);
+
+        $dataTable = Lava::DataTable();
+        $dataTable->addStringColumn('Cursos')
+                ->addNumberColumn('Perguntas');
+        foreach ($cursosMatriculas as $curso) {
+            $dataTable->addRow([$curso->curso,$curso->perguntas]);
+        }
+        Lava::ColumnChart('totalPerguntas', $dataTable, [
+            'title' => 'Total de Perguntas',
+            'titleTextStyle' => [
+                'color'    => '#eb6b2c',
+                'fontSize' => 14
+            ],
+        ]);
+
+        foreach ($cursosMatriculas as $curso) {
             $dataTable = Lava::DataTable();
             $dataTable->addStringColumn('Mês')
                     ->addNumberColumn('Perguntas Acumuladas')
                     ->addNumberColumn('Perguntas');
-            $quantidadeAcumulada = 0;
-            foreach ($curso->qtde_perguntas as $mes => $quantidade) {
-                $quantidadeAcumulada += $quantidade;
-                $dataTable->addRow([$mes, $quantidadeAcumulada, $quantidade]);
+            $perguntasAcumulada = 0;
+            foreach ($curso->perguntasMeses as $mes => $perguntas) {
+                $perguntasAcumulada += $perguntas;
+                $dataTable->addRow([$mes, $perguntasAcumulada, $perguntas]);
             }
             Lava::ComboChart(str_slug($curso->curso).'QtdePerguntas', $dataTable, [
                 'title' => 'Qtde de Perguntas',
@@ -198,7 +168,7 @@ class HomeController extends Controller
                     ->addNumberColumn('Progresso Acumulado')
                     ->addNumberColumn('Progresso');
             $progressoAcumulado = [];
-            foreach ($curso->qtde_progressos as $mes => $progresso) {
+            foreach ($curso->progressoMeses as $mes => $progresso) {
                 $progressoAcumulada = array_merge($progressoAcumulado,$progresso);
                 $dataTable->addRow([$mes, array_sum($progressoAcumulada)/(count($progressoAcumulada)?:1), array_sum($progresso)/(count($progresso)?:1)]);
             }
@@ -213,61 +183,32 @@ class HomeController extends Controller
                     1 => ['type' => 'columns'],
                 ]
             ]);
+        }
 
-            return $curso;
+        $cursosDiplomas = $cursos->filter(function ($curso) {
+            return $curso->diplomados->count();
         })->sort(function ($a,$b) {
-            return $a->media_progresso < $b->media_progresso;
+            return $a->diplomados->count()<$b->diplomados->count();
         });
 
         $dataTable = Lava::DataTable();
         $dataTable->addStringColumn('Cursos')
-                ->addNumberColumn('Média de Progresso');
-        foreach ($matriculasCursos as $curso) {
-            $dataTable->addRow([$curso->curso,$curso->media_progresso]);
+                ->addNumberColumn('Desistiram')
+                ->addNumberColumn('Não Concluido')
+                ->addNumberColumn('Concluido')
+                ->addNumberColumn('Diploma');
+        foreach ($cursosDiplomas as $curso) {
+            $dataTable->addRow([$curso->curso,$curso->desistentes->count(),$curso->incompletos->count(),$curso->completos->count(),$curso->diplomados->count()]);
         }
-        Lava::ColumnChart('mediaProgresso', $dataTable, [
-            'title' => 'Média de Progressos',
+        Lava::ColumnChart('statusAlunos', $dataTable, [
+            'title' => 'Quantidade de alunos por status',
             'titleTextStyle' => [
                 'color'    => '#eb6b2c',
                 'fontSize' => 14
             ],
         ]);
 
-        $dataTable = Lava::DataTable();
-        $dataTable->addStringColumn('Cursos')
-                ->addNumberColumn('Perguntas');
-        foreach ($matriculasCursos as $curso) {
-            $dataTable->addRow([$curso->curso,$curso->total_perguntas]);
-        }
-        Lava::ColumnChart('totalPerguntas', $dataTable, [
-            'title' => 'Total de Perguntas',
-            'titleTextStyle' => [
-                'color'    => '#eb6b2c',
-                'fontSize' => 14
-            ],
-        ]);
-
-        $diplomasCursos = Diploma::distinct()->get('curso')->map(function ($curso) {
-            $curso->diplomas = Diploma::whereCurso($curso->curso)->get();
-            $curso->desistentes = $curso->incompletos = $curso->completos = $curso->diplomados = 0;
-
-            $curso->meses = [];
-            $curso->diplomas->map(function ($diploma) use (&$curso) {
-                $meses = $curso->meses;
-                $mes = date('Y-m',strtotime($diploma->data));
-                if (!isset($meses[$mes])) {
-                    $meses[$mes] = [
-                        'desistentes' => 0,
-                        'incompletos' => 0,
-                        'completos' => 0,
-                        'diplomados' => 0,
-                    ];
-                }
-                $meses[$mes]['diplomados']++;
-                $curso->meses = $meses;
-                return $diploma;
-            });
-
+        foreach ($cursosDiplomas as $curso) {
             $dataTable = Lava::DataTable();
             $dataTable->addStringColumn('Mês')
                     ->addNumberColumn('Desistiram')
@@ -292,33 +233,7 @@ class HomeController extends Controller
                     'fontSize' => 14
                 ],
             ]);
-
-            $curso->desistentes = $desistentes;
-            $curso->incompletos = $incompletos;
-            $curso->completos = $completos;
-            $curso->diplomados = $diplomados;
-
-            return $curso;
-        })->sort(function ($a,$b){
-            return $a->diplomados<$b->diplomados;
-        });
-
-        $dataTable = Lava::DataTable();
-        $dataTable->addStringColumn('Cursos')
-                ->addNumberColumn('Desistiram')
-                ->addNumberColumn('Não Concluido')
-                ->addNumberColumn('Concluido')
-                ->addNumberColumn('Diploma');
-        foreach ($diplomasCursos as $curso) {
-            $dataTable->addRow([$curso->curso,$curso->desistentes,$curso->incompletos,$curso->completos,$curso->diplomados]);
         }
-        Lava::ColumnChart('statusAlunos', $dataTable, [
-            'title' => 'Quantidade de alunos por status',
-            'titleTextStyle' => [
-                'color'    => '#eb6b2c',
-                'fontSize' => 14
-            ],
-        ]);
 
         $formacoes = Aluno::distinct()->get('formacao')->map(function ($formacao) {
             $formacao->alunos = Aluno::whereFormacao($formacao->formacao)->count();
@@ -496,9 +411,9 @@ class HomeController extends Controller
         ]);
 
         return view('home',[
-            'avaliacoesCursos' => $avaliacoesCursos,
-            'matriculasCursos' => $matriculasCursos,
-            'diplomasCursos' => $diplomasCursos,
+            'cursosAvaliacoes' => $cursosAvaliacoes,
+            'cursosMatriculas' => $cursosMatriculas,
+            'cursosDiplomas' => $cursosDiplomas,
         ]);
     }
 
