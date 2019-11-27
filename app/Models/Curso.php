@@ -29,6 +29,13 @@ class Curso extends Model
         return str_slug($this->attributes['curso']);
     }
 
+    public function getMinutosAssistidasAttribute()
+    {
+        return $this->alunos->sum(function ($aluno) {
+            return $aluno->minutosAssistidas;
+        });
+    }
+
     public function getComentariosAttribute()
     {
         return $this->alunos()->whereNotNull('comentario')->get();
@@ -37,6 +44,18 @@ class Curso extends Model
     public function getAvaliacoesAttribute()
     {
         return $this->alunos()->whereNotNull('avaliacao')->get();
+    }
+
+    public function getAvaliacoesPonderadasMesesAttribute()
+    {
+        $avaliacoes = [];
+        foreach ($this->avaliacoes as $avaliacao) {
+            $mes = date('Y-m',strtotime($avaliacao->pivot->data_avaliacao));
+            if (!isset($avaliacoes[$mes])) $avaliacoes[$mes] = ['avaliacoes'=>[],'comentarios'=>[]];
+            if (!is_null($avaliacao->pivot->comentario)) $avaliacoes[$mes]['comentarios'][] = $avaliacao->pivot->comentario;
+            $avaliacoes[$mes]['avaliacoes'][] = $avaliacao->pivot->avaliacaoPonderada;
+        }
+        return $avaliacoes;
     }
 
     public function getAvaliacoesMesesAttribute()
@@ -51,25 +70,10 @@ class Curso extends Model
         return $avaliacoes;
     }
 
-    public function getMeses($inicio,$ult_acesso)
-    {
-        if (in_array(null,[$inicio,$ult_acesso])) return [];
-
-        $mes = date('Y-m-01',strtotime('-1 month',strtotime($inicio)));
-        $mes_fim = date('Y-m-01',strtotime($this->pivot->ult_acesso));
-        $meses = [];
-        do {
-            $mes = date('Y-m-01',strtotime('+1 month',strtotime($mes)));
-            $meses[] = date('Y-m',strtotime($mes));
-        } while ($mes != $mes_fim);
-
-        return $meses;
-    }
-
     public function getPerguntasAttribute()
     {
         return $this->alunos->sum(function ($aluno) {
-            return $aluno->pivot->perguntas_feitas+$aluno->pivot->perguntas_respondidas;
+            return $aluno->perguntas;
         });
     }
 
@@ -77,9 +81,9 @@ class Curso extends Model
     {
         $qtde_perguntas = [];
         foreach ($this->alunos as $aluno) {
-            $meses = $this->getMeses($aluno->pivot->inicio,$aluno->pivot->ult_acesso);
+            $meses = $aluno->meses;
             if (empty($meses)) continue;
-            $perguntas = $aluno->pivot->perguntas_feitas+$aluno->pivot->perguntas_respondidas;
+            $perguntas = $aluno->perguntas;
             while ($perguntas > 0) {
                 $media_perguntas = floor($perguntas/(count($meses)?:1));
                 $perguntas -= $media_perguntas;
@@ -102,7 +106,7 @@ class Curso extends Model
     {
         $qtde_progressos = [];
         foreach ($this->alunos as $aluno) {
-            $meses = $this->getMeses($aluno->pivot->inicio,$aluno->pivot->ult_acesso);
+            $meses = $aluno->meses;
             if (empty($meses)) continue;
             $progresso = $aluno->pivot->progresso;
             $media_progresso = $progresso/count($meses);
@@ -119,6 +123,13 @@ class Curso extends Model
     {
         return $this->avaliacoes->sum(function ($avaliacao) {
             return $avaliacao->pivot->avaliacao;
+        })/($this->avaliacoes->count()?:1);
+    }
+
+    public function getMediaPonderadaAttribute()
+    {
+        return $this->avaliacoes->sum(function ($avaliacao) {
+            return $avaliacao->pivot->avaliacaoPonderada;
         })/($this->avaliacoes->count()?:1);
     }
 

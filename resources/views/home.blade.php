@@ -1,16 +1,20 @@
 @extends('layouts.app')
 @push('scripts')
-@columnchart('mediaAvaliacoes', 'mediaAvaliacoes')
 @columnchart('qtdeAvaliacoes', 'qtdeAvaliacoes')
+@columnchart('mediaAvaliacoes', 'mediaAvaliacoes')
+@columnchart('mediaAvaliacoesPonderadas', 'mediaAvaliacoesPonderadas')
 @foreach ($cursosAvaliacoes as $curso)
 @areachart(str_slug($curso->curso).'QtdeAvaliacoes', str_slug($curso->curso).'QtdeAvaliacoes')
 @combochart(str_slug($curso->curso).'MediaAvaliacoes', str_slug($curso->curso).'MediaAvaliacoes')
+@combochart(str_slug($curso->curso).'MediaAvaliacoesPonderadas', str_slug($curso->curso).'MediaAvaliacoesPonderadas')
 @endforeach
-@columnchart('totalPerguntas','totalPerguntas')
 @columnchart('mediaProgresso','mediaProgresso')
+@columnchart('totalAssistido','totalAssistido')
+@columnchart('totalPerguntas','totalPerguntas')
 @foreach ($cursosMatriculas as $curso)
-@combochart(str_slug($curso->curso).'QtdePerguntas', str_slug($curso->curso).'QtdePerguntas')
 @combochart(str_slug($curso->curso).'MediaProgresso', str_slug($curso->curso).'MediaProgresso')
+@combochart(str_slug($curso->curso).'TotalAssistido', str_slug($curso->curso).'TotalAssistido')
+@combochart(str_slug($curso->curso).'QtdePerguntas', str_slug($curso->curso).'QtdePerguntas')
 @endforeach
 @columnchart('statusAlunos','statusAlunos')
 @foreach ($cursosDiplomas as $curso)
@@ -65,8 +69,9 @@
                             </div>
                             <div id="geralContent" class="collapse show" role="tabpanel" aria-labelledby="geralHeader">
                                 <div class="card-body">
-                                    <div id="mediaAvaliacoes"></div>
                                     <div id="qtdeAvaliacoes"></div>
+                                    <div id="mediaAvaliacoes"></div>
+                                    <div id="mediaAvaliacoesPonderadas"></div>
                                 </div>
                             </div>
                         </div>
@@ -86,6 +91,7 @@
                                 <div class="card-body">
                                     <div id="{{str_slug($curso->curso)}}QtdeAvaliacoes"></div>
                                     <div id="{{str_slug($curso->curso)}}MediaAvaliacoes"></div>
+                                    <div id="{{str_slug($curso->curso)}}MediaAvaliacoesPonderadas"></div>
                                 </div>
                             </div>
                         </div>
@@ -109,6 +115,7 @@
                             <div id="geralContent" class="collapse show" role="tabpanel" aria-labelledby="geralHeader">
                                 <div class="card-body">
                                     <div id="mediaProgresso"></div>
+                                    <div id="totalAssistido"></div>
                                     <div id="totalPerguntas"></div>
                                 </div>
                             </div>
@@ -127,8 +134,9 @@
                             <div id="{{str_slug($curso->curso)}}Content" class="collapse show" role="tabpanel"
                                 aria-labelledby="{{str_slug($curso->curso)}}Header">
                                 <div class="card-body">
-                                    <div id="{{str_slug($curso->curso)}}QtdePerguntas"></div>
                                     <div id="{{str_slug($curso->curso)}}MediaProgresso"></div>
+                                    <div id="{{str_slug($curso->curso)}}TotalAssistido"></div>
+                                    <div id="{{str_slug($curso->curso)}}QtdePerguntas"></div>
                                 </div>
                             </div>
                         </div>

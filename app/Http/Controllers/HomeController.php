@@ -31,6 +31,21 @@ class HomeController extends Controller
 
         $dataTable = Lava::DataTable();
         $dataTable->addStringColumn('Cursos')
+                ->addNumberColumn('Avaliações')
+                ->addNumberColumn('Comentários');
+        foreach ($cursosAvaliacoes as $curso) {
+            $dataTable->addRow([$curso->curso,$curso->avaliacoes->count(),$curso->comentarios->count()]);
+        }
+        Lava::ColumnChart('qtdeAvaliacoes', $dataTable, [
+            'title' => 'Quantidade de Avaliações e Comentários',
+            'titleTextStyle' => [
+                'color'    => '#eb6b2c',
+                'fontSize' => 14
+            ],
+        ]);
+
+        $dataTable = Lava::DataTable();
+        $dataTable->addStringColumn('Cursos')
                 ->addNumberColumn('Médias');
         foreach ($cursosAvaliacoes as $curso) {
             $dataTable->addRow([$curso->curso,$curso->media]);
@@ -45,13 +60,12 @@ class HomeController extends Controller
 
         $dataTable = Lava::DataTable();
         $dataTable->addStringColumn('Cursos')
-                ->addNumberColumn('Avaliações')
-                ->addNumberColumn('Comentários');
+                ->addNumberColumn('Médias');
         foreach ($cursosAvaliacoes as $curso) {
-            $dataTable->addRow([$curso->curso,$curso->avaliacoes->count(),$curso->comentarios->count()]);
+            $dataTable->addRow([$curso->curso,$curso->mediaPonderada]);
         }
-        Lava::ColumnChart('qtdeAvaliacoes', $dataTable, [
-            'title' => 'Quantidade de Avaliações e Comentários',
+        Lava::ColumnChart('mediaAvaliacoesPonderadas', $dataTable, [
+            'title' => 'Média das Avaliações Ponderada',
             'titleTextStyle' => [
                 'color'    => '#eb6b2c',
                 'fontSize' => 14
@@ -70,6 +84,13 @@ class HomeController extends Controller
                     ->addNumberColumn('Desvio Min.')
                     ->addNumberColumn('Desvio Max.');
             $avaliacoesAcumuladas = [];
+            $dataTable3 = Lava::DataTable();
+            $dataTable3->addStringColumn('Mês')
+                    ->addNumberColumn('Média Acumulada')
+                    ->addNumberColumn('Média Mensal')
+                    ->addNumberColumn('Desvio Min.')
+                    ->addNumberColumn('Desvio Max.');
+            $avaliacoesAcumuladasPonderadas = [];
             foreach ($curso->avaliacoesMeses as $mes => $avaliacoes) {
                 $dataTable->addRow([$mes, count($avaliacoes['avaliacoes']), count($avaliacoes['comentarios'])]);
 
@@ -82,6 +103,16 @@ class HomeController extends Controller
                 }
                 $desvio_padrao = array_sum($desvios)/(count($desvios)?:1);
                 $dataTable2->addRow([$mes, $media, array_sum($avaliacoes['avaliacoes'])/(count($avaliacoes['avaliacoes'])?:1), $media-$desvio_padrao, $media+$desvio_padrao]);
+
+                $avaliacoesAcumuladasPonderadas = array_merge($avaliacoesAcumuladasPonderadas, $avaliacoes['avaliacoes']);
+                $media = array_sum($avaliacoesAcumuladasPonderadas)/(count($avaliacoesAcumuladasPonderadas)?:1);
+                $desvios = [];
+                foreach ($avaliacoesAcumuladasPonderadas as $avaliacao) {
+                    $desvio = $media-$avaliacao;
+                    $desvios[] = $desvio < 0 ? -$desvio : $desvio;
+                }
+                $desvio_padrao = array_sum($desvios)/(count($desvios)?:1);
+                $dataTable3->addRow([$mes, $media, array_sum($avaliacoes['avaliacoes'])/(count($avaliacoes['avaliacoes'])?:1), $media-$desvio_padrao, $media+$desvio_padrao]);
             }
 
             Lava::AreaChart($curso->slug.'QtdeAvaliacoes', $dataTable, [
@@ -93,6 +124,20 @@ class HomeController extends Controller
             ]);
 
             Lava::ComboChart(str_slug($curso->curso).'MediaAvaliacoes', $dataTable2, [
+                'title' => 'Média das Avaliações',
+                'titleTextStyle' => [
+                    'color'    => '#eb6b2c',
+                    'fontSize' => 14
+                ],
+                'series' => [
+                    0 => ['type' => 'area'],
+                    1 => ['type' => 'columns'],
+                    2 => ['type' => 'line'],
+                    3 => ['type' => 'line']
+                ]
+            ]);
+
+            Lava::ComboChart(str_slug($curso->curso).'MediaAvaliacoesPonderadas', $dataTable3, [
                 'title' => 'Média das Avaliações',
                 'titleTextStyle' => [
                     'color'    => '#eb6b2c',
@@ -121,6 +166,20 @@ class HomeController extends Controller
         }
         Lava::ColumnChart('mediaProgresso', $dataTable, [
             'title' => 'Média de Progressos',
+            'titleTextStyle' => [
+                'color'    => '#eb6b2c',
+                'fontSize' => 14
+            ],
+        ]);
+
+        $dataTable = Lava::DataTable();
+        $dataTable->addStringColumn('Cursos')
+                ->addNumberColumn('Horas');
+        foreach ($cursosMatriculas as $curso) {
+            $dataTable->addRow([$curso->curso,$curso->minutosAssistidas]);
+        }
+        Lava::ColumnChart('totalAssistido', $dataTable, [
+            'title' => 'Total de Minutos Assistidos',
             'titleTextStyle' => [
                 'color'    => '#eb6b2c',
                 'fontSize' => 14
