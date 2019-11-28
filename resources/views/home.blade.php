@@ -4,21 +4,21 @@
 @columnchart('mediaAvaliacoes', 'mediaAvaliacoes')
 @columnchart('mediaAvaliacoesPonderadas', 'mediaAvaliacoesPonderadas')
 @foreach ($cursosAvaliacoes as $curso)
-@areachart(str_slug($curso->curso).'QtdeAvaliacoes', str_slug($curso->curso).'QtdeAvaliacoes')
-@combochart(str_slug($curso->curso).'MediaAvaliacoes', str_slug($curso->curso).'MediaAvaliacoes')
-@combochart(str_slug($curso->curso).'MediaAvaliacoesPonderadas', str_slug($curso->curso).'MediaAvaliacoesPonderadas')
+@areachart($curso->slug.'QtdeAvaliacoes', $curso->slug.'QtdeAvaliacoes')
+@combochart($curso->slug.'MediaAvaliacoes', $curso->slug.'MediaAvaliacoes')
+@combochart($curso->slug.'MediaAvaliacoesPonderadas', $curso->slug.'MediaAvaliacoesPonderadas')
 @endforeach
 @columnchart('mediaProgresso','mediaProgresso')
 @columnchart('totalAssistido','totalAssistido')
 @columnchart('totalPerguntas','totalPerguntas')
 @foreach ($cursosMatriculas as $curso)
-@combochart(str_slug($curso->curso).'MediaProgresso', str_slug($curso->curso).'MediaProgresso')
-@combochart(str_slug($curso->curso).'TotalAssistido', str_slug($curso->curso).'TotalAssistido')
-@combochart(str_slug($curso->curso).'QtdePerguntas', str_slug($curso->curso).'QtdePerguntas')
+@combochart($curso->slug.'MediaProgresso', $curso->slug.'MediaProgresso')
+@combochart($curso->slug.'TotalAssistido', $curso->slug.'TotalAssistido')
+@combochart($curso->slug.'QtdePerguntas', $curso->slug.'QtdePerguntas')
 @endforeach
 @columnchart('statusAlunos','statusAlunos')
 @foreach ($cursosDiplomas as $curso)
-@areachart(str_slug($curso->curso).'StatusAlunos', str_slug($curso->curso).'StatusAlunos')
+@areachart($curso->slug.'StatusAlunos', $curso->slug.'StatusAlunos')
 @endforeach
 @piechart('formacaoAlunos','formacaoAlunos')
 @piechart('anosAlunos','anosAlunos')
@@ -77,21 +77,21 @@
                         </div>
                         @foreach ($cursosAvaliacoes as $curso)
                         <div class="card">
-                            <div class="card-header" role="tab" id="{{str_slug($curso->curso)}}Header">
+                            <div class="card-header" role="tab" id="{{$curso->slug}}Header">
                                 <h5 class="mb-0">
                                     <a data-toggle="collapse" data-parent="#avaliacoes"
-                                        href="#{{str_slug($curso->curso)}}Content" aria-expanded="false"
-                                        aria-controls="{{str_slug($curso->curso)}}Content">
+                                        href="#{{$curso->slug}}Content" aria-expanded="false"
+                                        aria-controls="{{$curso->slug}}Content">
                                         {{$curso->curso}}
                                     </a>
                                 </h5>
                             </div>
-                            <div id="{{str_slug($curso->curso)}}Content" class="collapse show" role="tabpanel"
-                                aria-labelledby="{{str_slug($curso->curso)}}Header">
+                            <div id="{{$curso->slug}}Content" class="collapse show" role="tabpanel"
+                                aria-labelledby="{{$curso->slug}}Header">
                                 <div class="card-body">
-                                    <div id="{{str_slug($curso->curso)}}QtdeAvaliacoes"></div>
-                                    <div id="{{str_slug($curso->curso)}}MediaAvaliacoes"></div>
-                                    <div id="{{str_slug($curso->curso)}}MediaAvaliacoesPonderadas"></div>
+                                    <div id="{{$curso->slug}}QtdeAvaliacoes"></div>
+                                    <div id="{{$curso->slug}}MediaAvaliacoes"></div>
+                                    <div id="{{$curso->slug}}MediaAvaliacoesPonderadas"></div>
                                 </div>
                             </div>
                         </div>
@@ -122,21 +122,21 @@
                         </div>
                         @foreach ($cursosMatriculas as $curso)
                         <div class="card">
-                            <div class="card-header" role="tab" id="{{str_slug($curso->curso)}}Header">
+                            <div class="card-header" role="tab" id="{{$curso->slug}}Header">
                                 <h5 class="mb-0">
                                     <a data-toggle="collapse" data-parent="#matriculas"
-                                        href="#{{str_slug($curso->curso)}}Content" aria-expanded="false"
-                                        aria-controls="{{str_slug($curso->curso)}}Content">
+                                        href="#{{$curso->slug}}Content" aria-expanded="false"
+                                        aria-controls="{{$curso->slug}}Content">
                                         {{$curso->curso}}
                                     </a>
                                 </h5>
                             </div>
-                            <div id="{{str_slug($curso->curso)}}Content" class="collapse show" role="tabpanel"
-                                aria-labelledby="{{str_slug($curso->curso)}}Header">
+                            <div id="{{$curso->slug}}Content" class="collapse show" role="tabpanel"
+                                aria-labelledby="{{$curso->slug}}Header">
                                 <div class="card-body">
-                                    <div id="{{str_slug($curso->curso)}}MediaProgresso"></div>
-                                    <div id="{{str_slug($curso->curso)}}TotalAssistido"></div>
-                                    <div id="{{str_slug($curso->curso)}}QtdePerguntas"></div>
+                                    <div id="{{$curso->slug}}MediaProgresso"></div>
+                                    <div id="{{$curso->slug}}TotalAssistido"></div>
+                                    <div id="{{$curso->slug}}QtdePerguntas"></div>
                                 </div>
                             </div>
                         </div>
@@ -165,19 +165,19 @@
                         </div>
                         @foreach ($cursosDiplomas as $curso)
                         <div class="card">
-                            <div class="card-header" role="tab" id="{{str_slug($curso->curso)}}Header">
+                            <div class="card-header" role="tab" id="{{$curso->slug}}Header">
                                 <h5 class="mb-0">
                                     <a data-toggle="collapse" data-parent="#diplomas"
-                                        href="#{{str_slug($curso->curso)}}Content" aria-expanded="false"
-                                        aria-controls="{{str_slug($curso->curso)}}Content">
+                                        href="#{{$curso->slug}}Content" aria-expanded="false"
+                                        aria-controls="{{$curso->slug}}Content">
                                         {{$curso->curso}}
                                     </a>
                                 </h5>
                             </div>
-                            <div id="{{str_slug($curso->curso)}}Content" class="collapse show" role="tabpanel"
-                                aria-labelledby="{{str_slug($curso->curso)}}Header">
+                            <div id="{{$curso->slug}}Content" class="collapse show" role="tabpanel"
+                                aria-labelledby="{{$curso->slug}}Header">
                                 <div class="card-body">
-                                    <div id="{{str_slug($curso->curso)}}StatusAlunos"></div>
+                                    <div id="{{$curso->slug}}StatusAlunos"></div>
                                 </div>
                             </div>
                         </div>

@@ -123,7 +123,7 @@ class HomeController extends Controller
                 ],
             ]);
 
-            Lava::ComboChart(str_slug($curso->curso).'MediaAvaliacoes', $dataTable2, [
+            Lava::ComboChart($curso->slug.'MediaAvaliacoes', $dataTable2, [
                 'title' => 'Média das Avaliações',
                 'titleTextStyle' => [
                     'color'    => '#eb6b2c',
@@ -131,13 +131,13 @@ class HomeController extends Controller
                 ],
                 'series' => [
                     0 => ['type' => 'area'],
-                    1 => ['type' => 'columns'],
+                    1 => ['type' => 'bars'],
                     2 => ['type' => 'line'],
                     3 => ['type' => 'line']
                 ]
             ]);
 
-            Lava::ComboChart(str_slug($curso->curso).'MediaAvaliacoesPonderadas', $dataTable3, [
+            Lava::ComboChart($curso->slug.'MediaAvaliacoesPonderadas', $dataTable3, [
                 'title' => 'Média das Avaliações',
                 'titleTextStyle' => [
                     'color'    => '#eb6b2c',
@@ -145,7 +145,7 @@ class HomeController extends Controller
                 ],
                 'series' => [
                     0 => ['type' => 'area'],
-                    1 => ['type' => 'columns'],
+                    1 => ['type' => 'bars'],
                     2 => ['type' => 'line'],
                     3 => ['type' => 'line']
                 ]
@@ -210,7 +210,7 @@ class HomeController extends Controller
                 $perguntasAcumulada += $perguntas;
                 $dataTable->addRow([$mes, $perguntasAcumulada, $perguntas]);
             }
-            Lava::ComboChart(str_slug($curso->curso).'QtdePerguntas', $dataTable, [
+            Lava::ComboChart($curso->slug.'QtdePerguntas', $dataTable, [
                 'title' => 'Qtde de Perguntas',
                 'titleTextStyle' => [
                     'color'    => '#eb6b2c',
@@ -218,7 +218,7 @@ class HomeController extends Controller
                 ],
                 'series' => [
                     0 => ['type' => 'area'],
-                    1 => ['type' => 'columns'],
+                    1 => ['type' => 'bars'],
                 ]
             ]);
 
@@ -233,41 +233,50 @@ class HomeController extends Controller
                     ->addNumberColumn('Minutos Assistidos');
             $progressoAcumulado = [];
             foreach ($curso->progressoMeses as $mes => $progresso) {
-                $progressoAcumulada = array_merge($progressoAcumulado,$progresso);
-                $somaProgresso = array_sum($progressoAcumulada)/(count($progressoAcumulada)?:1);
-                $somaProgressoAcumulado = array_sum($progressoAcumulada)/(count($progressoAcumulada)?:1);
-                $dataTable->addRow([$mes, $somaProgressoAcumulado/(count($progressoAcumulada)?:1), $somaProgresso/(count($progresso)?:1)]);
+                $progressoAcumulado = array_merge($progressoAcumulado,$progresso);
+                $somaProgresso = array_sum($progresso);
+                $somaProgressoAcumulado = array_sum($progressoAcumulado);
+                $dataTable->addRow([$mes, $somaProgressoAcumulado/(count($progressoAcumulado)?:1), $somaProgresso/(count($progresso)?:1)]);
                 $dataTable2->addRow([$mes, $curso->carga_horaria/100*$somaProgressoAcumulado, $curso->carga_horaria/100*$somaProgresso]);
             }
-            Lava::ComboChart(str_slug($curso->curso).'MediaProgresso', $dataTable, [
-                'title' => 'Média de Progresso',
+            Lava::ComboChart($curso->slug.'MediaProgresso', $dataTable, [
+                'title' => 'Média de Progresso %',
                 'titleTextStyle' => [
                     'color'    => '#eb6b2c',
                     'fontSize' => 14
                 ],
                 'series' => [
                     0 => ['type' => 'area'],
-                    1 => ['type' => 'columns'],
+                    1 => ['type' => 'bars'],
                 ]
             ]);
 
-            Lava::ComboChart(str_slug($curso->curso).'TotalAssistido', $dataTable, [
-                'title' => 'Minutos Assistidos de Progresso',
+            Lava::ComboChart($curso->slug.'TotalAssistido', $dataTable2, [
+                'title' => 'Minutos Assistidos',
                 'titleTextStyle' => [
                     'color'    => '#eb6b2c',
                     'fontSize' => 14
                 ],
                 'series' => [
                     0 => ['type' => 'area'],
-                    1 => ['type' => 'columns'],
+                    1 => ['type' => 'bars'],
                 ]
             ]);
         }
 
         $cursosDiplomas = $cursos->filter(function ($curso) {
-            return $curso->diplomados->count();
+            return $curso->diplomados->count()
+                    or $curso->desistentes->count()
+                    or $curso->incompletos->count()
+                    or $curso->completos->count();
         })->sort(function ($a,$b) {
-            return $a->diplomados->count()<$b->diplomados->count();
+            $sort = $a->diplomados->count()-$b->diplomados->count();
+            if ($sort != 0) return $sort<0;
+            $sort = $a->completos->count()-$b->completos->count();
+            if ($sort != 0) return $sort<0;
+            $sort = $a->incompletos->count()-$b->incompletos->count();
+            if ($sort != 0) return $sort<0;
+            return $a->desistentes->count()<$b->desistentes->count();
         });
 
         $dataTable = Lava::DataTable();
@@ -294,18 +303,10 @@ class HomeController extends Controller
                     ->addNumberColumn('Não Concluido')
                     ->addNumberColumn('Concluido')
                     ->addNumberColumn('Diploma');
-            $desistentes = 0;
-            $incompletos = 0;
-            $completos = 0;
-            $diplomados = 0;
             foreach ($curso->meses as $mes => $alunos) {
-                $desistentes += $alunos['desistentes'];
-                $incompletos += $alunos['incompletos'];
-                $completos += $alunos['completos'];
-                $diplomados += $alunos['diplomados'];
-                $dataTable->addRow([$mes,$desistentes,$incompletos,$completos,$diplomados]);
+                $dataTable->addRow([$mes,$alunos['desistentes'],$alunos['incompletos'],$alunos['completos'],$alunos['diplomados']]);
             }
-            Lava::AreaChart(str_slug($curso->curso).'StatusAlunos', $dataTable, [
+            Lava::AreaChart($curso->slug.'StatusAlunos', $dataTable, [
                 'title' => 'Quantidade de alunos por status',
                 'titleTextStyle' => [
                     'color'    => '#eb6b2c',

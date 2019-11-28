@@ -39,10 +39,26 @@ class Aluno extends Model
     public function getMesesAttribute()
     {
         if (!$this->pivot) return false;
-        if (in_array(null,[$this->pivot->inicio,$this->pivot->ult_acesso])) return [];
+        if (in_array(null,[$this->pivot->inscricao,$this->pivot->ult_acesso])) return [];
 
-        $mes = date('Y-m-01',strtotime('-1 month',strtotime($this->pivot->inicio)));
+        $mes = date('Y-m-01',strtotime('-1 month',strtotime($this->pivot->inscricao)));
         $mes_fim = date('Y-m-01',strtotime($this->pivot->ult_acesso));
+        $meses = [];
+        do {
+            $mes = date('Y-m-01',strtotime('+1 month',strtotime($mes)));
+            $meses[] = date('Y-m',strtotime($mes));
+        } while ($mes != $mes_fim);
+
+        return $meses;
+    }
+
+    public function getMesesAtualAttribute()
+    {
+        if (!$this->pivot) return false;
+        if (is_null($this->pivot->inscricao)) return [];
+
+        $mes = date('Y-m-01',strtotime('-1 month',strtotime($this->pivot->inscricao)));
+        $mes_fim = date('Y-m-01');
         $meses = [];
         do {
             $mes = date('Y-m-01',strtotime('+1 month',strtotime($mes)));

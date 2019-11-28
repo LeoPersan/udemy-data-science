@@ -19,12 +19,12 @@
     * [x] Gráfico de barras Geral comparando a soma de perguntas feitas + perguntas respondidas
     * [x] Gráfico de área mensal para cada curso com a quantidade de perguntas feitas + perguntas respondidas divididas pela quantidade de dias entre a data de inicio e a data final, com um gráfico de barras com a quantidade de cada mês
     * [x] Gráfico de área mensal para cada curso com o percentual de progresso dividido pela quantidade de dias entre a data de inicio e a data final, com um gráfico de barras com a quantidade de cada mês
-    * [x] Gráfico de área mensal para cada curso com a quantiodade de horas assistidas, multiplicando o tempo total do curso e o percentual de progresso, dividido pela quantidade de dias entre a data de inicio e a data final, com um gráfico de barras com a quantidade de cada mês
+    * [x] Gráfico de área mensal para cada curso com a quantidade de horas assistidas, multiplicando o tempo total do curso e o percentual de progresso, dividido pela quantidade de dias entre a data de inicio e a data final, com um gráfico de barras com a quantidade de cada mês
     * [x] Gráfico de barras Geral comparando a soma de horas assistidas, multiplicando o tempo total do curso e o percentual de progresso
-* [ ] Base de dados de Diplomas
+* [x] Base de dados de Diplomas
     * [x] Collapse e Sortable nos gráficos gerais e de cada curso
-    * [ ] Gráfico de barras Geral comparando a quantidade de inscritos que desistiram do curso último acesso a mais de um mês, quantidade de inscritos que não completaram o curso, inscritos que completaram, mas não tiraram diploma, diplomas emitidos por curso
-    * [ ] Gráfico de área mensal para cada curso com a quantidade de inscritos que desistiram do curso último acesso a mais de um mês, quantidade de inscritos que não completaram o curso, inscritos que completaram, mas não tiraram diploma, diplomas emitidos por curso
+    * [x] Gráfico de barras Geral comparando a quantidade de inscritos que desistiram do curso último acesso a mais de um mês, quantidade de inscritos que não completaram o curso, inscritos que completaram, mas não tiraram diploma, diplomas emitidos por curso
+    * [x] Gráfico de área mensal para cada curso com a quantidade de inscritos que desistiram do curso último acesso a mais de um mês, quantidade de inscritos que não completaram o curso, inscritos que completaram, mas não tiraram diploma, diplomas emitidos por curso
 * [x] Base de dados de alunos
     * [x] Gráfico de pizza comparando a quantidade de alunos de cada nível de ensino
     * [x] Gráfico de pizza comparando a quantidade de alunos por idade

@@ -55,6 +55,7 @@ class Curso extends Model
             if (!is_null($avaliacao->pivot->comentario)) $avaliacoes[$mes]['comentarios'][] = $avaliacao->pivot->comentario;
             $avaliacoes[$mes]['avaliacoes'][] = $avaliacao->pivot->avaliacaoPonderada;
         }
+        ksort($avaliacoes);
         return $avaliacoes;
     }
 
@@ -67,6 +68,7 @@ class Curso extends Model
             if (!is_null($avaliacao->pivot->comentario)) $avaliacoes[$mes]['comentarios'][] = $avaliacao->pivot->comentario;
             $avaliacoes[$mes]['avaliacoes'][] = $avaliacao->pivot->avaliacao;
         }
+        ksort($avaliacoes);
         return $avaliacoes;
     }
 
@@ -111,11 +113,10 @@ class Curso extends Model
             $progresso = $aluno->pivot->progresso;
             $media_progresso = $progresso/count($meses);
             foreach ($meses as $mes) {
-                if (!isset($qtde_progressos[$mes]))
-                    $qtde_progressos[$mes] = 0;
-                $qtde_progressos[$mes] += $media_progresso;
+                $qtde_progressos[$mes][] = $media_progresso;
             }
         }
+        ksort($qtde_progressos);
         return $qtde_progressos;
     }
 
@@ -148,37 +149,45 @@ class Curso extends Model
 
     public function getCompletosAttribute()
     {
-        return $this->alunos()->whereNotNull('diploma')->get();
+        return $this->alunos()->whereNull('diploma')->whereProgresso(100)->get();
     }
 
     public function getIncompletosAttribute()
     {
-        return $this->alunos()->whereNotNull('diploma')->get();
+        return $this->alunos()->whereNull('diploma')->where('progresso','<',100)->where('ult_acesso','>=',date('Y-m-d',strtotime('-30 days')))->get();
     }
 
     public function getDesistentesAttribute()
     {
-        return $this->alunos()->whereNotNull('diploma')->get();
+        return $this->alunos()->whereNull('diploma')->where('progresso','<',100)->where('ult_acesso','<',date('Y-m-d',strtotime('-30 days')))->get();
     }
 
     public function getMesesAttribute()
     {
-        $meses = [];
+        $resultados = [];
         foreach ($this->alunos as $aluno) {
-            if (is_null($aluno->pivot->diploma)) continue;
-            $mes = date('Y-m',strtotime($aluno->pivot->diploma));
-            if (!isset($meses[$mes])) $meses[$mes] = [
-                    'desistentes' => 0,
-                    'incompletos' => 0,
-                    'completos' => 0,
-                    'diplomados' => 0,
-                ];
-            $meses[$mes]['desistentes']++;
-            $meses[$mes]['incompletos']++;
-            $meses[$mes]['completos']++;
-            $meses[$mes]['diplomados']++;
+            $meses = $aluno->mesesAtual;
+            foreach ($meses as $mes) {
+                if (!isset($resultados[$mes])) {
+                    $resultados[$mes] = [
+                        'desistentes' => 0,
+                        'incompletos' => 0,
+                        'completos' => 0,
+                        'diplomados' => 0,
+                    ];
+                }
+                $status = 'desistentes';
+                if ($aluno->pivot->ult_acesso >= date('Y-m-d',strtotime('-1 month',strtotime($mes.'-01'))))
+                    $status = 'incompletos';
+                if ($aluno->pivot->progresso == 100 and $aluno->pivot->ult_acesso >= $mes.'-01')
+                    $status = 'completos';
+                if (!is_null($aluno->pivot->diploma) and $aluno->pivot->diploma >= $mes.'-01')
+                    $status = 'diplomados';
+                $resultados[$mes][$status]++;
+            }
         }
-        return $meses;
+        ksort($resultados);
+        return $resultados;
     }
 
     public function instrutores()
